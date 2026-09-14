@@ -1,0 +1,115 @@
+                                                       SPRING SECURITY INTERNAL FOLLOW :-
+
+USER ENTERED CREDENTIALS 
+          ↓
+        1 ↓   
+          ↓
+SPRING SECURITY FILTERS
+          ↓
+          ↓ 1. AuthorizationFilter (class) : 
+          ↓             void doFilter() method :-
+          ↓                     it is going to examine each & every request the backend application is recieving and it is going to understad wheather the path that is 
+          ↓                     invoked by the client application, is the public path or secured path, if it is public path then it is going to allow the traffic
+          ↓                     otherwise it is going to make sure that the end user is authenticated, in-case if the user is already authenticated in the previous
+          ↓                     session. then this filter, it is going to re-use the existing sessionId details and the authentication details that we stored inside 
+          ↓                     the security context.and allow the request to the controller layer and in-case if the user is not authenticated so this filter is going
+          ↓                     to handover to the next filter which is responsible to display the logging page.
+          ↓ 2. DefaultLoginPageGeneratingFilter (class) :
+          ↓            void doFilter() method :- 
+          ↓                     this filter is responsible to generate the html logging page.
+          ↓
+          ↓
+        2 ↓
+          ↓
+          ↓      
+   AUTHENTICATION  
+          ↓
+          ↓ 3. UsernamePasswordAuthenticationFilter (class) :
+          ↓              Authentication attemptAuthentication() :- 
+          ↓                       this filter only invokes when we try to provide our credentials by using the form login page, so in this filter, from the request
+          ↓                       username and password will be extracted, once extractraction done, both will be converted into an authenticated object, but 
+          ↓                       for this convertion username and password will be passed to unauthenticated method of 
+          ↓                       UsernamePasswordAuthenticationToken (class) which is:
+          ↓                                                                      UsernamePasswordAuthenticationToken (class)
+          ↓                                                                                        ↓
+          ↓                                                                                        ↓ extends  
+          ↓                                                                                        ↓
+          ↓                                                                       AbstractAuthenticationToken (abstract-class) 
+          ↓                                                                                        ↓
+          ↓                                                                                        ↓ implements
+          ↓                                                                                        ↓
+          ↓                                                                                  Authentication (Interface)
+          ↓                       since, UserNamePasswordAuthenticationToken class is implementing the Authentication interface we can assume it is an Authentication data 
+          ↓                       type object. and once the extraction of credentials is completed, the same filter UserNamePasswordAuthenticationToken, it will
+          ↓                       handover the object to the AuthenticationManager.
+          ↓
+          ↓                                           Explation Authentication (Interface) -> so by using Authentication data type object we can store various kind
+          ↓                                           of information like, authorities, credentials etc.
+          ↓                                                                            by using principle() - we can store username. 
+          ↓                                                                            by using credentials() - we can store password.
+          ↓                                                                            by using authorities() - we can store the collection of roles.
+          ↓                                           there are some helper method as well like, isAuthenticated()- to identify whether the authentication is already
+          ↓                                           completed or not. whenever authentication is completed the framework is going to invoke setAuthentication() method 
+          ↓                                           which is going to set the authentication boolean as true. and later isAuthenticated() will use it.
+        3 ↓ 
+          ↓ 
+          ↓
+AUTHENTICATION MANAGER 
+          ↓ 
+          ↓ AuthenticationManager (Interface)
+          ↓                  ↓ 
+          ↓                  ↓
+          ↓                  ↓ implements
+          ↓                  ↓
+          ↓            ProviderManager (Class) :-
+          ↓                          Authentication authenticate() method - 
+        4 ↓                                       it take Authentication object as Input and it has logic written to look for all the authentication provider that are
+          ↓                                       register inside the project, using for loop it is going to ask each of the provider that, are you going to support
+          ↓                                       the given style of the authentication by invoking the supports method, if the supports method confirms yes, then only
+          ↓                                       next logic will be executed where it is going to invoke the actual authentication logic of the provider, otherwise
+          ↓                                       given authentication provider will skip using continue keyword.
+          ↓                                   if Not defined any authentication provider manually then in this scenario the framework is going to consider a default
+          ↓                                   authentication provider called DAOAuthenticationProvider.
+AUTHENTICATIONPROVIDERS
+          ↓               Explation DAOAuthenticationProvider (Class) -> 
+          ↓                              AuthenticationProvider (Interface)
+          ↓                                      ↓                authenticate();
+          ↓                                      ↓                  supports();
+          ↓                                      ↓
+          ↓                                      ↓ implemnts
+          ↓                                      ↓
+          ↓                                      ↓
+          ↓                          AbstractUserDetailsAuthenticationProvider (abstract-class)
+          ↓                                      ↓          @Override
+          ↓                                      ↓          supports():- inside this method, they are simply performing a check if the given authentication class is
+          ↓                                      ↓                       same as UserNamePasswordAuthenticationToken class then it is going to return as true otherwise                 
+          ↓                                      ↓                       false.                                 
+          ↓                                      ↓           @Override
+          ↓                                      ↓          authenticate():- once the request reach to authenticate method available in the AbstractUserDetailsAuthenticationProvider     
+          ↓                                      ↓                           provider implementation class, they are trying to extract the username from the authentication         
+          ↓                                      ↓                           object. then next check if userDetails already available in same cache if not they are  
+          ↓                                      ↓  extends                  invoking retriveUser() method present in DAOAuthenticationProvider.
+          ↓                                      ↓                      
+          ↓                          DAOAuthenticationProvider (Class)                                
+          ↓                                             retriveUser():- here is there is logic to retriveUser details based upon the username by using             
+          ↓                                                             UserDetailsService/getUserDetailsService interface. with the help of loadUserByUsername method.
+          ↓                                                           
+          ↓            
+          ↓                                                                                                                              
+          ↓                                                                                                                    
+          ↓                                                                                                                       
+          ↓                                                                                                                        
+          ↓                                                                                                                       
+          ↓                                                  
+          ↓  NOTE:- above explanation is for FORM base authentication, but for Basic authentication except on filter called : BasicAuthenticationFilter which has method doFilterInternal();                                               
+          ↓         this filter is responsible for extracting the username password from header. look for code more details.                                                        
+          ↓                                                                 
+          ↓                                                                 
+          ↓                                                 
+          ↓                                                 
+          ↓                                                
+
+
+
+
+                                                                                                                                                            

@@ -1,0 +1,1552 @@
+SECTION 01 :
+        Introduction to Microservices Architecture
+----------------------------------------------------
+                Q1. Explain Difference between Monolithic,SOA and Microservices ?
+                         - Monolithic :
+                                   - Diagram :
+                                                             A SINGLE SERVER
+                                             -------------------------------------------------
+                                             - - - - - - - - - - - - - - - - - - - - - - - -
+                                             -                                               -
+                                             -      +-----------------------------------+    -
+                                             -      |      Presentation Layer (UI)      |    -
+                                             -      +-----------------------------------+    -
+                                             -                                               -
+                                             -      +-----------------------------------+    -
+                                             -      |       Business Logic Layer        |    -
+                                             -      +-----------------------------------+    -
+                                             -                                               -
+                                             -      +-----------------------------------+    -
+                                             -      |         Data Access Layer         |    -
+                                             -      +-----------------------------------+    -
+                                             -                                               -
+                                             - - - - - - - - - - - - - - - - - - - - - - - -
+                                             -------------------------------------------------
+                                                                     |
+                                                                     ↓
+                                                                  _______
+                                                                /         \
+                                                               /           \
+                                                              |   =======   |
+                                                               \           /
+                                                                \_________/
+                                                                Supporting DB
+                                    - Back a decade, all the applications used to be deployed as a Single unit where all functionality deployed together inside a single server. 
+                                    - We call this architecture approach as Monolithic.
+                                    - Advantages:
+                                               • Simpler development and deployment for smaller teams and applications
+                                               • Fewer cross-cutting concerns
+                                               • Better performance due to no network latency
+                                    - Disadvantages :
+                                               • Difficult to adopt new technologies
+                                               • Limited flexibility
+                                               • Single code base and difficult to maintain
+                                               • Not Fault tolerance
+                                               • Tiny update and feature development always need a full deployment
+                                  Note: We have various forms of Monolithic with the names like Single-Process Monolith, Modular Monolith, Distributed Monolith
+                         - SOA (Service-Oriented Architecture) :
+                                    - Diagram :                     
+                                                  - - - - - - - - - - - - - - - - - - - - - - - -
+                                                  -                SERVER 1                       -
+                                                  -      +----------------------------------+     -
+                                                  -      |      Presentation Layer (UI)     |     -
+                                                  -      +----------------------------------+     -
+                                                  -                     |                         -
+                                                  -                     V                         -
+                                                  -                Middleware                     -
+                                                  -                     |                         -
+                                                  -      +----------------------------------+     -
+                                                  -      |     Enterprise Service Bus       |     -
+                                                  -      |              (ESB)               |     -
+                                                  -      +----------------------------------+     -
+                                                  -                     |                         -
+                                                  -                     V                         -
+                                                  -                                               -
+                                                  -                   SERVER 2                    -
+                                                  -      -----------------------------------      -
+                                                  -      |   +------------+ +------------+ |      -
+                                                  -      |   |  Accounts  | |   Cards    | |      -
+                                                  -      |   |  Service   | |  Service   | |      -
+                                                  -      |   +------------+ +------------+ |      -
+                                                  -      |                                 |      -
+                                                  -      |         +------------+          |      -
+                                                  -      |         |   Loans    |          |      -
+                                                  -      |         |  Service   |          |      -
+                                                  -      |         +------------+          |      -
+                                                  -      -----------------------------------      -
+                                                  -                                               -
+                                                  - - - - - - - - - - - - - - - - - - - - - - - -
+                                                                          |
+                                                                          |
+                                                                          V
+                                                                        ______
+                                                                      /        \
+                                                                     | ======== |
+                                                                      \________/
+                                                                      Supporting DB
+                                    - SOA (Service-Oriented Architecture) was introduced to solve the problems of large monolithic applications. 
+                                    - It is an architectural style that organizes a software system into a collection of loosely connected and interoperable services. 
+                                    - It helps in designing and developing large applications by dividing them into smaller and modular services. 
+                                    - These services can be developed, deployed, and managed independently. 
+                                    - In SOA, an ESB (Enterprise Service Bus) can be used to help different services communicate with each other and 
+                                      handle tasks such as message routing, transformation, and integration.
+                                    - Advantages :
+                                               • Reusability of services
+                                               • Better maintainability
+                                               • Higher reliability
+                                               • parallel development
+                                    - Disadvantages :
+                                               • Complex management due to comnunication protocols (e.g., SOAP)
+                                               • High investment costs due to vendor in middleware
+                                               • Extra overload
+                         - Microservices  :
+                                    - Diagram :                  
+                       - - - - - - - - - - - - - - - - - - - - - - - -
+                       -               SERVER 1                        -
+                       -      +----------------------------------+     -
+                       -      |      Presentation Layer (UI)     |     -
+                       -      +----------------------------------+     -
+                       -                     |                         -
+                       -                     |                         -
+                       -                     V                         -
+                       -                                               -
+                       -      Multiple Microservices deployed in       -
+                       -         separate servers/containers           -
+                       -                                               -
+                       -          [MS]      [MS]      [MS]             -
+                       -                                               -
+                       -          [MS]      [MS]      [MS]             -
+                       -                                               -
+                       -          [MS]      [MS]      [MS]             -
+                       -                                               -
+                       -                     |                         -
+                       - - - - - - - - - - - | - - - - - - - - - - - -
+                                             |
+                                             V
+                               ______   ______   ______   ______
+                              /      \ /      \ /      \ /      \
+                             |  ====  |  ====  |  ====  |  ====  | Multiple Supporting DBs. Typically each DB for a service
+                              \______/ \______/ \______/ \______/
+                               
+                                    - Microservices is an approach to developing a single application as a suite of small services, 
+                                    - each running in its own process and communicating with lightweight mechanisms, built around business capabilities
+                                      and independently deployable by fully automated deployment machinery. ( From Article by Jannes Lewis and Martin Fowler's)
+                                    - Advantages :
+                                               • Easy to develop, test, and deploy
+                                               • Increased agility
+                                               • Ability to scale horizontally
+                                               • Parallel development
+                                               • Modeled Around a Business Domain
+                                    - Disadvantages :
+                                               • Complexity
+                                               • Infrastructure overhead
+                                               • Security concerns
+
+SECTION 02 :
+        Building Microservices using spring boot
+------------------------------------------------
+                Q1. How To build Microservices ?
+                              - Challenge-1 :
+                                       - when considering a web application, the traditional approach involves packaging it as a WAR or EAR file. 
+                                         These archive formats are commonly used to bundle Java applications, which are then deployed to web servers
+                                         like Tomcat or application servers like WildFly.Do you think the same approach works for building microservices Off course not
+                                         because Organizations may need to build 100s of microservices. Building, packaging, and deploying all the microservices
+                                         using traditional methods can be an extremely challenging and practically impossible task.                                         
+                                       - How to overcome this challenge :
+                                                                 The clue is spring boot.
+
+                Q2. Why Spring boot for microservices ?
+                             - spring Boot is a framework that simplifies the development and deployment of Java applications, including microservices. 
+                               With Spring Boot,you can build self-contained, executable JAR files instead of the traditional WAR or EAR files. 
+                               These JAR files contain all the dependencies and configurations required to run the microservice. 
+                               This approach eliminates the need for external web servers or application servers.
+                             - Advantages of Building Microservices with Spring Boot :
+                                       - Built-in Features & Integrations :
+                                                  • Provides a range of built-in features and integrations such as auto-configuration, dependency injection, 
+                                                    and support for various cloud platforms.
+                                       - Embedded Server :
+                                                  • Provides an embedded Tomcat, Jetty, or Undertow server, which can run the microservice directly without 
+                                                    the need for a separate server installation.
+                                       - Production-Ready Features :
+                                                  • Inbuilt support for production-ready features such as metrics, health checks, and externalized configuration.
+                                       - Starter Dependencies :
+                                                  • We can quickly create a microservice project and start coding with a range of starter dependencies that 
+                                                    provide pre-configured settings for various components such as databases, queues, etc.
+                                       - Cloud-Native Development :
+                                                  • Well-suited for cloud-native development.
+                                                  • It integrates with cloud platforms like Kubernetes, provides support for containerization, and enables 
+                                                    seamless deployment to popular cloud providers.
+
+                Q3. What is Web Services ? 
+                             - A Web Service is any service that: Runs over the web (HTTP/HTTPS), Allows communication between systems (machine-to-machine).
+                Q4. What is Rest Services and how to implement Rest Services ? 
+                             - A type of web service.
+                             - REST (Representational state transfer) services are one of the most often encountered ways to implement communication between two web
+                               apps.
+                             -  REST offers access to functionality the server exposes through endpoints a client can call.
+                             -  What are the best standard need to follow while developing Rest services :
+                                                  - Business logic supporting CRUD operations :
+                                                                                 Create -> HttpMethod.POST
+                                                                                 Read  -> HttpMethod.GET
+                                                                                 Update -> HttpMethod.PUT/PATCH
+                                                                                 Delete -> HttpMethod.DELETE
+                                                  - Proper input validation & exception Handling :
+                                                             • Make sure all the REST services perform input validations,handle the runtime and business exceptions 
+                                                               propertly. In all kind of scenarios, REST services should send a meaningful response to the clients.
+                                                  - Document REST Services :
+                                                             • With the help of standards like Open API Specification, Swager, make sure to document your REST APIs.
+                                                               This helps Your client, third party developers to understand your services clearly.
+
+
+                Q1. What is schema.sql ?
+                             - ek SQL script file hai jo database ka structure (tables, columns, constraints, etc.) create karne ke liye use hoti hai.
+                             - database ka schema manually define karne ke liye hota hai. jbki ddl-auto entity dekhr table bnata hai
+                             - location :
+                                           src
+                                            └── main
+                                                 └── resources
+                                                      └── schema.sql
+                Q1. Explain BaseEntity & Auditing ?
+                             - BaseEntity: 
+                                       • Common fields ko ek parent class me rakhkar code duplication avoid karna.
+                             - Purpose for Auditing : 
+                                       • Entity ke createdAt, updatedAt, createdBy, updatedBy ko automatically track karna.
+                             - @MappedSuperclass: 
+                                       • Parent ke fields ko child entity ki table me map karta hai; parent ki separate table nahi banti.
+                             - Main annotations:
+                                       • @MappedSuperclass
+                                       • @EntityListeners(AuditingEntityListener.class): Auditing events ko listen karke auditing fields ko automatically populate karta hai.
+                                       • @CreatedDate : Entity create hone ka date/time automatically store karta hai.
+                                       • @LastModifiedDate : Entity update hone ka last date/time automatically store karta hai.
+                                       • @CreatedBy      : Entity create karne wale user ki information automatically store karta hai.
+                                       • @LastModifiedBy : Entity ko last update karne wale user ki information automatically store karta hai.
+                                       • @EnableJpaAuditing : Spring Boot application me JPA Auditing feature ko enable karta hai.
+                             - Basic implementation steps :
+                                   Step 1 — Dependencies :
+                                                    • Spring Data JPA dependency honi chahiye.
+                                   Step 2 — Auditing enable karo :
+                                                    @SpringBootApplication
+                                                    @EnableJpaAuditing
+                                                    public class Application {
+                                                    }
+                                   Step 3 — BaseEntity banao :
+                                                    @MappedSuperclass
+                                                    @EntityListeners(AuditingEntityListener.class)
+                                                    public class BaseEntity {
+                                                        @CreatedDate
+                                                        private LocalDateTime createdAt;
+                                                        @LastModifiedDate
+                                                        private LocalDateTime updatedAt;
+                                                    }
+                                   Step 4 — Entity ko extend karao :
+                                                    @Entity
+                                                    public class User extends BaseEntity {
+                                                        @Id
+                                                        @GeneratedValue(strategy = GenerationType.IDENTITY)
+                                                        private Long id;
+                                                        private String name;
+                                                    }
+                                   Step 5 — AuditorAware: Current user/auditor ki information provide karta hai,jise @CreatedBy aur @LastModifiedBy use karte hain:
+                                                    @Component("auditAwareImpl") 
+                                                    public class AuditAwareImpl implements AuditorAware<String> { 
+                                                       @Override 
+                                                       public Optional<String> getCurrentAuditor() { 
+                                                          return Optional.of("ACCOUNTS_MS"); 
+                                                    } 
+                                                   }
+
+                Q5. Explain DTO pattern ?
+                            - The Data Transfer Object (DTO) pattern is a design pattern that allows you to transfer data between different parts of your application. 
+                            - DTOs are simple objects that contain only data, and they do not contain any business logic. 
+                            - This makes them ideal for transferring data between different layers of your application, such as the presentation layer and the data access layer.
+                            - Here are some Of the benefits Of using the DTO pattern:
+                                      - Reduces network traffic: 
+                                                     • DTOs can be used to batch up multiple pieces of data into a single object, which can reduce the number of 
+                                                       network requests that need to be made. 
+                                                     • This can improve performance and reduce the load on your servers.
+                                      - Encapsulates serialization:
+                                                     • DTOs can be used to encapsulate the serialization logic for transferring data over the wire. 
+                                                     • This makes it easier to change the serialization format in the future, without having to make changes to 
+                                                       the rest of your application.
+                                      - Decouples layers: 
+                                                     • DTOs can be used to decouple the presentation layer from the data access layer. 
+                                                     • This makes it easier to change the presentation layer without having to change the data access layer.
+                Q1. What is Swagger ?
+                            - Swagger is a set of tools used to document, visualize, and test REST APIs. 
+                            - It provides an interactive UI where developers can see available API endpoints, their HTTP methods, request parameters, 
+                              request/response formats, and can directly test the APIs.
+                            - Why do we need Swagger :
+                                            - REST APIs ki documentation automatically generate karne ke liye
+                                            - Available endpoints aur HTTP methods easily samajhne ke liye
+                                            - Request parameters aur response structure dekhne ke liye
+                                            - API ko browser se directly test karne ke liye
+                                            - Frontend aur backend developers ke beech API understanding improve karne ke liye
+                            - Steps to Implement Swagger :
+                                            - Dependency   :
+                                                       • <springdoc-openapi> dependency add karte hain, jo Swagger UI aur OpenAPI documentation provide karti hai.
+                                                       •        		<dependency>
+			                                                               <groupId>org.springdoc</groupId>
+			                                                               <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			                                                               <version>3.1.0</version>
+		                                                                 </dependency>
+                                            - Swagger UI :
+                                                       • Browser me /swagger-ui.html ya /swagger-ui/index.html open karke APIs ko visualize aur test kar sakte hain.
+                                            - Annotations (Optional) :
+                                                       - Annotations ka use karke API documentation ko detailed/customize kar sakte hain.
+                                                                • @OpenAPIDefinition :
+                                                                            @OpenAPIDefinition
+                                                                            → Complete OpenAPI documentation ki overall information define karta hai. main class me.
+                                                                            │
+                                                                            ├── info = @Info
+                                                                            │   → API ki basic metadata/information define karta hai.
+                                                                            │
+                                                                            │   ├── title
+                                                                            │   │   → API documentation ka title/name define karta hai.
+                                                                            │   │
+                                                                            │   ├── description
+                                                                            │   │   → API documentation ka description define karta hai.
+                                                                            │   │
+                                                                            │   ├── version
+                                                                            │   │   → API documentation ka version define karta hai.
+                                                                            │   │
+                                                                            │   ├── contact = @Contact
+                                                                            │   │   → API se related contact person/team ki information define karta hai.
+                                                                            │   │
+                                                                            │   │   ├── name
+                                                                            │   │   │   → Contact person/team ka name define karta hai.
+                                                                            │   │   │
+                                                                            │   │   ├── email
+                                                                            │   │   │   → Contact person/team ka email define karta hai.
+                                                                            │   │   │
+                                                                            │   │   └── url
+                                                                            │   │       → Contact person/company ki website URL define karta hai.
+                                                                            │   │
+                                                                            │   └── license = @License
+                                                                            │       → API ki license information define karta hai.
+                                                                            │
+                                                                            │       ├── name
+                                                                            │       │   → License ka name define karta hai.
+                                                                            │       │
+                                                                            │       └── url
+                                                                            │           → License ki details/reference URL define karta hai.
+                                                                            │
+                                                                            └── externalDocs = @ExternalDocumentation
+                                                                                → External documentation ki information/reference define karta hai.
+    
+                                                                                ├── description
+                                                                                │   → External documentation ka description define karta hai.
+                                                                                │
+                                                                                └── url
+                                                                                    → External documentation ka URL define karta hai.
+
+                                                                • @Tag :
+                                                                            @Tag
+                                                                            → API ke related group/tag ki information define karta hai.controller class ke uper.
+                                                                            │
+                                                                            ├── name
+                                                                            │   → API tag ka name define karta hai.
+                                                                            │
+                                                                            └── description
+                                                                                → API tag ka description define karta hai.
+
+                                                                • @Operation :
+                                                                            @Operation
+                                                                            → API operation ki basic information/documentation define karta hai.
+                                                                            │
+                                                                            ├── summary
+                                                                            │   → API operation ka short summary/title define karta hai.
+                                                                            │
+                                                                            └── description
+                                                                                → API operation ka detailed description define karta hai.
+
+                                                                • @ApiResponses :
+                                                                            @ApiResponses
+                                                                            → API operation ke possible HTTP responses ki information define karta hai.
+                                                                            │
+                                                                            ├── @ApiResponse
+                                                                            │   → Ek specific HTTP response ki information define karta hai.
+                                                                            │   │
+                                                                            │   ├── responseCode
+                                                                            │   │   → HTTP response ka status code define karta hai.
+                                                                            │   │
+                                                                            │   └── description
+                                                                            │       → HTTP response ka description define karta hai.
+                                                                            │
+                                                                            └── @ApiResponse
+                                                                                → Ek specific HTTP response ki information define karta hai.
+                                                                                │
+                                                                                ├── responseCode
+                                                                                │   → HTTP response ka status code define karta hai.
+                                                                                │
+                                                                                ├── description
+                                                                                │   → HTTP response ka description define karta hai.
+                                                                                │
+                                                                                └── content = @Content
+                                                                                    → Response ke content/body ki information define karta hai.
+                                                                                    │
+                                                                                    └── schema = @Schema
+                                                                                        → Response body ke data structure/schema ko define karta hai.
+                                                                                        │
+                                                                                        └── implementation
+                                                                                            → Response body ke liye use hone wali Java class define karta hai.
+                                                                                            → further us implented class me @Schema lgate hai hr fields pe.
+               NOTE:- look codes and another notepad notes for microservices functionalities.
+
+
+SECTION 03 :
+        HOW DO WE RIGHT SIZE OUR MICROSERVICES & IDENTITY BOUNDARIES 
+---------------------------------------------------------------------
+                Q1. How to right size & Identify service boundaries of microservices ?
+                              - Challenge-2 :
+                                       - One of the most challenging parts of building a successful microservices system is the identification Of proper microservice 
+                                         boundaries and defining the size Of each microservice. 
+                                       - Below are the most common followed approaches in the industry:
+                                            - Domain-Driven Sizing :
+                                                                 • Many of our changes or improvements are based on business needs.
+                                                                 • So, we can define the size and boundaries of microservices based on:
+                                                                                                                                - Domain-Driven Design (DDD)
+                                                                                                                                - Business capabilities
+                                                                 • This means each microservice is designed around a specific business area or capability.
+                                                                 • However, this process takes a lot of time.
+                                                                 • It also requires good knowledge of the business domain.
+                                            - Event Storming Sizing :
+                                                                 • Conduct an interactive and fun session with various stakeholders.
+                                                                 • The goal is to identify the list of events in the system, such as:
+                                                                                                                                - Completed Payment
+                                                                                                                                - Search for a Product
+                                                                 • Based on these events, we can identify:
+                                                                                               Commands,
+                                                                                               Reactions
+                                                                 • We can then group these events together and try to create domain-driven services.
+
+                Q2. What is Strangler Fig pattern and when to use Strangler Fig pattern?
+                             - The Strangler Fig Pattern is a software migration pattern.
+                             - used to gradually replace or refactor a legacy system with a new system, piece by piece, without disrupting the existing functionality.
+                             - The Strangler Fig Pattern facilitates the migration of a monolithic application to a modern microservices architecture by leveraging 
+                               a Domain-Driven Design (DDD) approach.
+                             - This pattern gets its name from the way a strangler Fig plant grows around an existing tree, slowly replacing it until the original 
+                               tree is no longer needed.
+                             - A Strangler Facade is introduced to route traffic between the legacy monolithic application and the new microservices. 
+                               During this phase, both the monolith and microservices coexist.
+                             - As the microservices are developed and stabilized, the corresponding functionality in the monolith is gradually phased out and 
+                               eventually removed. This process involves four key steps: Identification, Transformation, Co-existence, and Elimination.
+                             - When to Use the Strangler Fig Pattern:
+                                     - When you need to modernize a large or complex legacy system.
+                                     - When you want to avoid the risk associated with a complete system rewrite or "big bang" migration.
+                                     - When the legacy system needs to remain operational during the transition to the new system.
+
+SECTION 04 :
+        HANDLE DEPLOYEMENT,PORTABILITY & SCALABILITY OF MICROSERVICES USING DOCKER 
+----------------------------------------------------------------------------------
+                          CHALLENGE-3 : 
+                                - DEPLOYEMENT :
+                                       How do we deploy all the tiny 100s of microservices with less effort & cost?
+                                - PORTABILITY :
+                                       How do we move our 100s of microservices across environments with less effort,configurations & cost?
+                                - SCALABILITY :
+                                       How do we scale our applications based on the demand on the fly with minimum effort & cost?
+
+                         - To overcome the above challenges, we should containerize our microservices. Why? Containers offer a self-contained and isolated environment 
+                           for applications, including all necessary dependencies. By containerizing an application, it becomes portable and can run seamlessly in any 
+                           cloud environment. Containers enable unified management Of applications regardless of the language or framework used.
+                         - So Docker is an open source platform that "provides the ability to package and run an application in a loosely isolated environment 
+                           called a container"
+
+                Q1. How Containers are different from Virtual Machines ?
+
+                      VIRTUALIZATION / Virtual Machine 💻     VS     CONTAINERIZATION / Container 🐳 ?
+
+                            | Virtualization                            | Containerization                                       |
+                            | ----------------------------------------- | ------------------------------------------------------ |
+                            | Runs Virtual Machines (VMs).              | Runs Containers.                                       |
+                            | Each VM has its own operating system.     | Containers share the host operating system kernel.     |
+                            | Uses more memory and storage.             | Uses less memory and storage .                         |
+                            | Slower to start.                          | Faster to start.                                       |  
+                   Virtualization Architecture
+                   ---------------------------------
+                            +-------------------------------------------------------------+        
+                            |                      PHYSICAL SERVER (Host Machine)         |               
+                            |-------------------------------------------------------------|               
+                            |   +-----------------------------------------------------+   |               
+                            |   |                HOST OPERATING SYSTEM                |   |               
+                            |   |-----------------------------------------------------|   |              
+                            |   |                  Hypervisor (e.g., VMware, KVM)     |   |               
+                            |   |-----------------------------------------------------|   |
+                            |   |     +------------------+   +------------------+     |   |              
+                            |   |     |   Virtual Machine |   |  Virtual Machine |    |   |             
+                            |   |     |-------------------|   |------------------|    |   |
+                            |   |     | Guest OS (Ubuntu) |   | Guest OS (CentOS)|    |   |
+                            |   |     | App + Libraries   |   | App + Libraries  |    |   |
+                            |   |     +------------------+   +------------------+     |   |
+                            |   +-----------------------------------------------------+   |
+                            +-------------------------------------------------------------+
+                                 Note:- Aapke laptop/PC me kya hota hai: eg - Laptop me Windows installed hai.Aap usi laptop me ek Linux VM banana chahte ho.
+                                        Kaise possible hota hai? Iske liye ek software lagta hai: VMware/VirtualBox/Hyper-V, Ye software Hypervisor kehlata hai.
+                                        Hypervisor kya karta hai? Hypervisor ek middle layer hota hai: Hardware → Hypervisor → Multiple VM’s
+                                        Hypervisor ka role: CPU allocate karta hai, RAM allocate karta hai, Storage allocate karta hai,Network allocate karta hai,
+                                        Har VM ko ek alag computer jaisa environment deta hai Example: Aapke laptop me: 16GB RAM, 512GB SSD 
+                                        Aap Linux VM banate ho aur usko bolte: 4GB RAM use kare, 40GB storage use kare. Ye sab hypervisor assign karta hai.
+                                        VM me OS ka kya role hota hai? VM ke andar: Apna poora OS hota hai, Apne drivers hote hain, Apni system files hoti hain.
+
+                                        Docker kya karta hai? Sirf application ko chalata hai aur bolta hai: Main host OS ka kernel share kar lunga.
+                                        Kernel kya hota hai? Kernel is the heart of OS. Kernel ka kaam: Process management, Memory management, File system, Networking,
+                                        Hardware communication
+
+                    Containerization Architecture
+                    ---------------------------------
+                            +-------------------------------------------------------------+
+                            |                      PHYSICAL SERVER (Host Machine)         |
+                            |-------------------------------------------------------------|
+                            |   +-----------------------------------------------------+   |
+                            |   |                HOST OPERATING SYSTEM                |   |
+                            |   |-----------------------------------------------------|   |
+                            |   |             Container Engine (e.g., Docker)         |   |
+                            |   |-----------------------------------------------------|   |
+                            |   |     +------------------+   +------------------+     |   |
+                            |   |     |    Container 1   |   |    Container 2   |     |   |
+                            |   |     |------------------|   |------------------|     |   |
+                            |   |     | App + Libraries  |   | App + Libraries  |     |   |
+                            |   |     | (Shares Host OS) |   | (Shares Host OS) |     |   |
+                            |   |     +------------------+   +------------------+     |   |
+                            |   +-----------------------------------------------------+   |
+                            +-------------------------------------------------------------+
+
+                Q1. What is container ?
+                            - A container is a loosely isolated environment inside your local system/server/vms that allows us to build and run software packages. 
+                            - or a container is a running instance of an image.
+                            - you can create multiple containers from one image.
+                            - Docker containers are :
+                                                 lightweight
+                                                 fast to start
+                                                 isolated from each other like, app running in seperate bubbles
+                                                 disposable(start / delete anytime)
+
+                Q2. What is software containerization ?  
+                            - Software containerization is an OS virtualization method that is used to deploy and run containers without using a virtual machine (VM). 
+                            - Containers can run on physical hardware, in the cloud, VMS, and across multiple OSs.
+                            - What Exactly happens in containerization :
+                                            - Containers are based on the concept Of operating system (OS) virtualization, where multiple containers can run on 
+                                              the same physical or virtual machine, sharing the same OS kernel. 
+                                              This differs from traditional virtualization, where each virtual machine (VM) runs a separate OS instance.
+                                            - In containerization, Linux features such as namespaces and cgroups play a crucial role in providing isolation 
+                                              and resource management. 
+                                              Here's a brief explanation of these concepts:
+                                                         - NAMESPACES :
+                                                                - Linux namespaces allow for the creation of isolated environments within the operating system. 
+                                                                - Each container has its own set of namespaces, including process, network, mount,
+                                                                  IPC (interprocess communication), and user namespaces.
+                                                                - These namespaces ensure that processes within a container are only aware of and can interact with
+                                                                   resources within their specific namespace, providing a level of isolation
+                                                         - CONTROL GROUPS :
+                                                                - cgroups provide resource management and allocation capabilities for containers.
+                                                                - They allow administrators to control and limit the resources (such as CPU, memory, disk I/O, and 
+                                                                  network bandwidth) that containers can consume.
+                                                                -  By using cgroups, container runtimes can enforce resource restrictions and prevent one container from
+                                                                   monopolizing system resources, ensuring fair allocation among containers.
+                            - HOW DOES DOCKER WORKS ON MAC & WINDOWS OS :
+                                                                - When you install Docker on a Linux OS, you receive the complete Docker Engine on your Linux host. 
+                                                                  However, if you opt for Docker Desktop for Mac or Windows, only the Docker client is installed on 
+                                                                  your macOS or Windows host. Behind the scenes, a lightweight virtual machine is configured with Linux,
+                                                                  and the Docker server component is installed within that virtual machine. but your experience will be
+                                                                  very similar to using Docker on a Linux machine, with minimal noticeable differences.
+
+                Q3. What is docker ?
+                            - Docker is a containerization tool  that enables developers to automate the deployment, scaling, and management Of applications using containerization.
+                            - it contains : Application, All the software it needs, All the configurations it depends on.
+                            - Advantage of using Docker :
+                                                    - consistency => same behavior everywhere.
+                                                    - isolation =>  each app runs in its own box.
+                                                    - easy setup => run one command and app is ready.
+                                                    - portability => from laptop  -> server -> cloud
+                                                    - faster deployments => ship entire enviroment as an image.
+
+                Q6. Explain Docker Architecture ?
+                            - Docker is based on a client–server model.
+                            - The Docker client sends requests to the Docker Daemon.
+                            - The Docker Daemon handles container lifecycle tasks.
+                              +----------------------+      +-------------------------------------------------------------+      +----------------------+
+                              |        CLIENT        |      |                      DOCKER HOST                            |      |       REGISTRY       |
+                              +----------------------+      +-------------------------------------------------------------+      +----------------------+
+                              | docker run           |----->| +-------------------+   +----------------+  +------------+ |<---->| Docker Hub           |
+                              | docker build         |----->| |   Docker Daemon   |-->|     Images     |->| Containers | |      | Private Registry     |
+                              | docker pull          |----->| |     (Engine)      |   |----------------|  |------------| |----->| Pull / Push Images   |
+                              |                      |      | |                   |   | Python         |  | Python App | |      +----------------------+
+                              +----------------------+      | |                   |   | Redis          |  | Redis      | |
+                                                            | |                   |   | NGINX          |  | NGINX      | |
+                                                            | |                   |   | Ubuntu         |  | Ubuntu     | |
+                                                            | +-------------------+   +----------------+  +------------+ |
+                                                            +-------------------------------------------------------------
+                            - What happend if instruction given to Docker server :
+                                 - STEP-1 :
+                                       • Instruction from Docker Client to Server to run a container.
+                                 - STEP-2 :
+                                       • Docker server finds the image in registry if not found locally.
+                                 - STEP-3 :
+                                       • Docker server pulls the image from registry into local.
+                                 - STEP-4 :
+                                       • Docker server creates a running container from the image.
+
+                Q7. How to Install Docker in windows ?
+                       - STEP-1 :
+                            - Dowload docker dekstop : 
+                                       • https://www.docker.com/products/docker-desktop/
+                            - Docker Desktop :
+                                       • Docker Desktop is a desktop application jo Docker ke components like, Docker Engine, Docker CLI, aur Docker Compose ko 
+                                         bundle (package) karke install karta hai.
+                                       • GUI (Dashboard) → Containers, Images, Volumes, Networks ko graphical interface se manage karne ke liye.
+                       - STEP-2 :
+                            - Loging with Docker Desktop with a Docker Hub account :
+                                     - benefit of logging into Docker Desktop with a Docker Hub account :
+                                                                                         • No need to log in repeatedly.
+                                                                                         • Access private repositories.
+                                                                                         • Manage Docker Hub images directly from Docker Desktop.
+
+                Q7. What are the different approaches to generate Docker images for microservices? 
+                        - To generare docker images from our existing microservices, there are three different commonly used approaches:
+                                   - Dockerfile :
+                                              - In this, we need to write a dockerfile with the list Of instructions which can be passed to Docker server to generate 
+                                                a docker image based on the given instructions.
+                                              - Running a Spring Boot app as a container using Dockerfile :
+                                                   STEPS TO BE FOLLOWED :
+                                                                Step-1 : 
+                                                                     • Run the maven command, "mvn clean install" from the location where pom.xml is present 
+                                                                       to generate a fat jar inside target folder.
+                                                                Step-2 :
+                                                                     • Write instructions to Docker inside a file with the name Dockerfile to generate a Docker image. 
+                                                                     • Sample instructions are mentioned bellow :
+                                                                                   # Start with a base image containing Java runtime
+                                                                                              FROM openjdk:17-jdk-slim
+                                                                                   # lnformation around who maintains the image
+                                                                                               MAINTAINER eazybytes.com
+                                                                                   # Add the application's jar to the container
+                                                                                               COPY target/accounts-O.O.1-SNAPSHOT.jar accounts-O.O.1-SNAPSHOT.jar
+                                                                                   # execute the application
+                                                                                               ENTRYPOINT ["java","-jar", "/accounts-O.O.1-SNAPSHOT.Jar"]
+                                                                                                            instead of space here providing (,)
+                                                                           NOTE:
+                                                                              1. builds and runs the Spring Boot application through Maven : mvn spring-boot:run
+                                                                              2. Java command to run jar file : java -jar target/your-app-name.jar
+                                                                Step-3 :
+                                                                     • Execute the docker command  "docker build . -t eazybtes/accounts:s4 from the location
+                                                                     • where Dockerfile is present. This will generate the docker image based on the tag name provided
+                                                                Step-4 :
+                                                                     • Execute the docker command "docker run -p 8080:8080 eazybtes/accounts:s4
+                                                                     • This will start the docker container based on the docker image name and port mapping provided
+
+                                   - Buildpacks :
+                                              - Buildpacks (https://buildpacks.io), a project initiated by Heroku & Pivotal and now hosted by the CNCF. 
+                                              - It simplifies containerization since with it, we don't need to write a low-level dockerfile.
+                                              - Running a Spring Boot app as a container using Buildpacks :
+                                                   STEPS TO BE FOLLOWED :
+                                                                Step-1 : 
+                                                                     • Add the configurations like mentioned below inside the pom.xml.
+                                                                     • Make sure to pass the image name details :
+                                                                                       <build>
+                                                                                           <plugins>
+                                                                                               <plugin>
+                                                                                                   <groupId>org.springframework.boot</groupId>
+                                                                                                   <artifactId>spring-boot-maven-plugin</artifactId>
+                                                                                                   <configuration>
+                                                                                                       <image>
+                                                                                                           <name>meraz786/${project.artifactId}</name>
+                                                                                                       </image>
+                                                                                                   </configuration>
+                                                                                               </plugin>
+                                                                                           </plugins>
+                                                                                       </build>
+                                                                Step-2 :
+                                                                     • Run the maven command "mvn spring-boot:build-image" from the location where pom.xml is present 
+                                                                       to generate the docker image with out the need Of Dockerfile.
+                                                                Step-3 :
+                                                                     • Execute the docker command "docker run -p 8090:8090 eazybtes/accounts
+                                                                       This will start the docker container based on the docker image name and port mapping provided.
+                                   - Google Jib :
+                                              - Jib is an open-source Java tool maintained by Google for building Docker images of Java applications. 
+                                              - It simplifies containerization since with it, we don't need to write a low-level dockerfile.
+                                              - you need to go   https://github.com/GoogleContainerTools/jib
+                                              - Running a Spring Boot app as a container using Google Jib :
+                                                   STEPS TO BE FOLLOWED :
+                                                                Step-1 : 
+                                                                     • Add the configurations like mentioned below inside the pom.xml.
+                                                                     • Make sure to pass the image name details :
+                                                                                       <build>
+                                                                                           <plugins>
+                                                                                               <plugin>
+                                                                                                   <groupId>com.google.cloud.tools</groupId>
+                                                                                                    <artifactId>jib-maven-plugin</artifactId>
+                                                                                                    <version>3.3.2</version>
+                                                                                                   <configuration>
+                                                                                                       <to>
+                                                                                                           <name>eazybytes/${project.artifactId}:s4</name>
+                                                                                                       </to>
+                                                                                                   </configuration>
+                                                                                               </plugin>
+                                                                                           </plugins>
+                                                                                       </build>
+                                                                Step-2 :
+                                                                     • Run the maven command " mvn compile jib:dockerBuild" from the location where pom.xml is present 
+                                                                       to generate the docker image with out the need Of Dockerfile.
+                                                                Step-3 :
+                                                                     • Execute the docker command "docker run -p 9000:9000 eazybtes/cards:s4
+                                                                       This will start the docker container based on the docker image name and port mapping provided.
+                                         NOTE: if you don't have docker locally then it directly push ur code to various platform like docker hub, gcp, aws. 
+                                               but need credential for that look documentation. 
+
+                Q15. What is port-mapping/port-forwarding/port-publishing?
+                              - By default, containers are connected to an isolated network within the Docker host. 
+                              - To access a container from your local network, you need to configure port mapping explicitly. 
+                              - For instance like accounts, when running the accounts Service application, we can provide the port mapping
+                              - as an argument in the docker run command: -p 8081:8080 (where the first value represents the external port and the second value represents the container port).
+                      
+                Q1. Why can't we run multiple containers using CLI ?
+                              - When dealing with the execution of multiple containers, using the Docker CLI can be error-prone.                 
+                              - Writing commands directly in a Terminal window can introduce errors, make the code difficult to understand. 
+
+                Q19. What is a Docker compose and advantage of docker compose?
+                              - Docker compose :
+                                             - It is a tool provided by that allows you to define and manage multi-container applications.
+                                             - It uses a YAML file to describe the services, networks, and volumes required for your application. 
+                                             - Using it, you can easily specify the configuration and relationships between different containers, making it simpler 
+                                               to set up and manage complex application environments.
+                              - advantage of docker compose :
+                                             - By using a single command, you can create and start all the containers defined in your Docker Compose file.
+                                             -  Docker Compose handles the orchestration and networking aspects, ensuring that the containers can communicate with 
+                                                each other as specified in the configuration. 
+                                             -  It also provides options for scaling services, controlling dependencies, and managing the application lifecycle.
+                              - Docker Compose extra point:
+                                             - to check docker compose installed or not:   docker compose version
+                                             - docker compose file name and extension should be : docker-compose.yml
+                                             - 
+                                           
+                Q20. What are the predefined/reserved keywords in Docker Compose YAML files?    
+                                - services: networks: volumes: image: ports: environment: container_name:
+
+                Q21. Explain important command of Docker ?
+                                - look notes for all command with explanation.
+SECTION 05 :
+        DEEP DIVE ON CLOUD NATIVE APPs & 15-Factor Methodology
+--------------------------------------------------------------
+                Q1. What are cloud native applications ?
+                                - Cloud-native applications are software applications designed specifically to leverage cloud computing principles and take
+                                  full advantage of cloud-native technologies and services. 
+                                - These applications are built and optimized to run in cloud environments, utilizing the scalability, elasticity, and flexibility 
+                                  offered by the cloud.
+                                - NOTE:- Spring Cloud technologies are commonly used to build cloud-native applications.
+                                - Important characteristics of cloud-native applications :
+                                              • Microservices :
+                                                     Often built using a microservices architecture,where the application is broken down into smaller, loosely coupled 
+                                                     services that can be developed, deployed, and scaled independently
+                                              • Containers :
+                                                     Typically packaged and deployed using containers, such as Docker containers. Containers provide a lightweight and consistent 
+                                                     environment for running applications, making them highly portable across different cloud platforms and infrastructure
+                                              • Scalability & Elasticity :
+                                                     Designed to scale horizontally, allowing them to handle increased loads by adding more instances Of services. 
+                                                     They can also automatically scale up or down based on demand, thanks to cloud-native orchestration platforms like
+                                                     Kubernetes
+                                              • DevOps Practices :
+                                                     Embrace DevOps principles, promoting collatnration between development and operations teams. 
+                                                     They Often incorporate continuous integration, continuous delivery, and automated deployment pipelines to
+                                                     streamline the software development and deployment processes.
+                                              • Resilience & Fault Tolerance :
+                                                     Designed to be resilient in the face of failures. They utilize techniques such as distributed architecture,
+                                                     load balancing, and automated failure recovery to ensure high availability and fault tolerance.
+                                              • Cloud-Native Services :
+                                                     Take advantage Of cloud-native services provided by the cloud platform, such as managed databases, messaging queues, 
+                                                     caching systems, and identity services. This allows developers to focus more on application logic and less on 
+                                                     managing infrastructure components.
+                                - Development Principles or guide line of building Cloud Native: 12 Factors & Beyond :
+                                              - The engineering team at Heroku, a cloud platform, introduced the 12-Factor methodology, a set of development principles
+                                                designed to guide the development and deployment of cloud-native applications. As technology evolved and new tools, 
+                                                practices, and requirements emerged, the original 12-Factor methodology was expanded by Kevin Hoffman in his book 
+                                                'Beyond the Twelve-Factor App'. He introduced three additional factors and updated the existing principles to better 
+                                                address modern application development needs. This revised approach is known as the 15-Factor methodology.
+                                              - 15-Factor methodology :
+                                                            1. One codebase, one application
+                                                            2. API first
+                                                            3. Dependency management
+                                                            4. Design, build, release, run
+                                                            5. Configuration, credentials & code
+                                                            6. Logs
+                                                            7. Disposability
+                                                            8. Backing services
+                                                            9. Environment parity
+                                                            10. Administrative processes
+                                                            11. Port binding
+                                                            12. Stateless processes
+                                                            13. Concurrency
+                                                            14. Telemetry
+                                                            15. Authentication & authorization
+                                              • One codebase, one application :
+                                                       - Each application should have its own codebase, stored in its own repository.
+                                                       - The same codebase can be used for multiple deployments/environments without rebuilding the application.
+                                                       - Example: An Accounts microservice has one Git repository, and the same code is deployed to development,
+                                                                  testing, and production environments.
+                                              • API first :
+                                                       - Design the API first before building the application, so other teams/services can use it easily.
+                                                       - It helps teams work independently and allows internal changes without affecting applications that use the API.
+                                                       - Example: An Accounts Service first defines APIs like /accounts and /accounts/{id}, then other teams can
+                                                                  build their services using these APIs.
+                                              • Dependency management :
+                                                       - All application dependencies should be clearly listed in a manifest file and managed by tools like Maven or Gradle.
+                                                       - Dependencies should be downloaded and managed automatically instead of being handled manually.
+                                                       - Example: In a Spring Boot application, dependencies like Spring Web and Spring Data JPA are added in
+                                                                  pom.xml, and Maven downloads them automatically.
+                                              • Design, build, release, run :
+                                                       - Application development is divided into 4 separate stages: Design → Build → Release → Run.
+                                                       - Each stage has a specific purpose, and the build/release should be fixed and uniquely identified so the same
+                                                         version can be safely deployed and reproduced.
+                                                       - Example: Developers design the application → Maven builds a JAR → version 1.0.0 is released →
+                                                                  the same JAR is run in the production environment.
+                                              • Configuration, credentials & code :
+                                                       - Configuration and credentials should be kept separate from the application code and managed externally,
+                                                         preferably using environment variables.
+                                                       - This allows the same application code to be deployed in different environments without rebuilding it.
+                                                       - Example: Database username, password, and URL are stored as environment variables instead of writing
+                                                                  them directly in application.properties.
+                                              • Logs :
+                                                       - Applications should write logs to standard output (stdout), while an external log aggregator like Loki or
+                                                         ELK (Elasticsearch, Logstash, Kibana) handles log storage, collection, and viewing.
+                                                       - Example: A Spring Boot application writes logs to stdout → Loki collects and stores the logs →
+                                                                  Grafana is used to view them.
+                                              • Disposability :
+                                                       - In cloud-native applications, application instances should be easy to start and stop when needed.
+                                                       - They should start quickly to handle increased load and shut down gracefully so ongoing requests or jobs can
+                                                         finish properly.
+                                                       - Example: Kubernetes can quickly start new application instances when traffic increases and replace failed
+                                                                  instances automatically.
+                                              • Backing services :
+                                                       - Backing services are external resources that an application depends on, such as databases, message brokers,
+                                                         caches, or APIs.
+                                                       - They should be treated as attached resources, so they can be replaced or changed without modifying the
+                                                         application code.
+                                                       - Example: A local MySQL database can be replaced with an AWS database by changing the connection
+                                                                  configuration, without changing the application code.
+                                              • Environment parity :
+                                                       - Environment Parity means keeping development, testing, and production environments as similar as possible
+                                                         to avoid unexpected issues during deployment.
+                                                       - It reduces time, people, and tools gaps between environments.
+                                                       - Example: Using the same PostgreSQL version in development, testing, and production instead of H2 locally
+                                                                  and PostgreSQL in production.
+                                              • Administrative processes :
+                                                       - Administrative or management tasks like database migrations, batch jobs, and maintenance tasks should be
+                                                         treated as separate processes and run in the same environment as the application.
+                                                       - Example: A database migration can run as a separate one-time process, complete the task, and then stop.
+                                              • Port binding :
+                                                       - Port Binding means a cloud-native application exposes its service through a specific port and can run
+                                                         independently without relying on an external server like Tomcat.
+                                                       - Example: A Spring Boot application uses an embedded Tomcat server and runs on port 8080, so users or other
+                                                                  services can access it through that port.
+                                              • Stateless processes :
+                                                       - Stateless Processes means each application instance should not store user or application data locally.
+                                                       - Any required state should be stored in an external backing service like a database, so any instance can be
+                                                         replaced or scaled without losing data.
+                                                       - Example: A Spring Boot application stores user/session data in a database or Redis instead of keeping it
+                                                                  inside the application instance.
+                                              • Concurrency :
+                                                       - Concurrency means an application should be able to handle multiple tasks or user requests at the same time.
+                                                       - It helps the application scale horizontally by running multiple processes/instances to handle increased workload.
+                                                       - Example: A Spring Boot web application uses multiple threads from a thread pool to handle many HTTP requests
+                                                                  at the same time.
+                                              • Telemetry :
+                                                       - Telemetry means collecting data from an application so we can monitor its health, performance, and behavior
+                                                         remotely. Common telemetry data includes logs, metrics, traces, health status, and events.
+                                                       - Example: Spring Boot sends logs, metrics, and traces to tools like Grafana, Prometheus, and Tempo for monitoring
+                                                                  and troubleshooting.
+                                              • Authentication & authorization :
+                                                       - Authentication checks who the user is, while Authorization checks what the user is allowed to do. Together,
+                                                         they help secure the application using a zero-trust approach.
+                                                       - Example: A user logs in with username/password → Authentication verifies the user → Authorization checks
+                                                                  whether the user can access an admin API.
+
+SECTION 06 :
+        CONFIGURATION MANAGEMENT IN MICROSERVICES
+-------------------------------------------------
+                Q1. Configuration basically hum krte hee q hai ?  
+                          - Configuration is used to externalize and manage application behavior dynamically without modifying or rebuilding the application code.
+                            or Application ka behavior bina code change kiye control karna.
+
+                Q2. What are the challenges comes for configuration management in microservices? 
+                          CHALLENGE-4 : 
+                                - SEPARATION OF CONFIGs/PROPERTlES :
+                                       How do we separate the configurations/properties from the microservices so that same Docker image can be deployed in multiple envs.
+                                - INJECT CONFIGs/PROPERTlEs :
+                                       How do we inject configurations/properties that microservice needed during start up of the service
+                                - MAINTAIN CONFIGs/PROPERTlES :
+                                       How do we maintain configurations/properties in a centralized repository along with versioning of them
+
+                         - To overcome the above challenges, There are multiple solutions available in Spring ecosystem to handle this challenge. 
+                           Below are the solutions. Let's try to identify which one suites for microservices :
+                                                                             1) Configuring Spring Boot with properties and profiles
+                                                                             2) Applying external configuration with Spring Boot
+                                                                             3) Implementing a configuration server with Spring Cloud Config Server
+                       - before moving to above three solutions lets know HOW CONFIGURATIONs HANDLED IN TRADITIONAL APPs & MICROSERVICES :
+                              - Traditional Apps: 
+                                          - Configuration is often bundled with the application code. 
+                                          - If configuration changes, the application may need to be rebuilt, or separate builds may be created for different environments.
+                              - Microservices / Cloud-Native Apps: 
+                                          - Configuration is kept separate from the application code and provided externally for each environment. 
+                                          - The same immutable build/artifact can be deployed to development, testing, and production with different configurations.
+                                          - Example: Same application build uses different database URLs, credentials, and service URLs in development and production.
+
+                Q4. How configuration works in spring boot?
+                              - Spring Boot lets you externalize your configuration so that you can work with the same application code in different environments. 
+                              - You can use a variety of external configuration sources, include Java properties files, YAML files, environment variables, and command-line arguments.
+                              - By default, Spring Boot look for the configurations or properties inside application.properties/yaml present in the classpath location.
+                                But we can have other property files as well and make SpringB00t to read from them.
+                              - Spring Boot uses a very particular order that is designed to allow sensible overriding of values. Properties are considered in the 
+                                following order (with values from lower items overriding earlier ones):
+                                                                • Properties present inside files like application.properties
+                                                                • OS Environmental variables
+                                                                • Java System properties (System.getProperties())
+                                                                • JNDI attributes from java:comp/env
+                                                                • ServletContext init parameters
+                                                                • ServletConfig init parameters
+                                                                • Command line arguments
+                              - How to read properties in spring boot apps?
+                          - In Spring Boot, there are multiple approaches to reading properties. 
+                          - Below are the most commonly used approaches :
+                                    - Using @Value Annotation :
+                                              - You can use the @Value annotation to directly inject property values into your beans. 
+                                              - This approach is suitable for injecting individual properties into specific fields.
+                                              - For example: 
+                                                       @Value("${property.name}")
+                                                       private String propertyValue;
+                                              - look codes in notes.
+                                    - Using Environment :
+                                              - The Environment interface p des methods to access properties from the application's environment. 
+                                              - You can autowire the Environment bean and use its methods to retrieve values.
+                                              - This approach is more flexible and allows accessing properties programmatically. 
+                                              - For example:
+                                                         @Autowired
+                                                         private Environment env;
+                                                         public void getProperty() {
+                                                                 String propertyValue = env.getProperty("property.name");
+                                                         }
+                                              - look code in notes.
+                                    - Using @ConfigurationProperties :
+                                              - Recommended approach as it avoids hard coding the proper keys.
+                                              - The @ConfigurationProperties annotation enables binding of entire groups of properties to a bean.
+                                              - You define a configuration class with annotated fields matching the properties,
+                                                and Spring Boot automatically maps the properties to the corresponding fields.
+                                              - For example :
+                                                           @ConfigurationProperties("prefix")
+                                                           public class MyConfig {
+                                                                 private String property;
+                                                                 // getters and setters
+                                                           }
+                                              - @EnabIeConfigurationProperties needs to mention on top of the SpringBoot main class, to enable the above feature
+                                              - look code in notes.
+                
+                Q9. What is profiles in spring boot?
+                           - Spring provides a great tool for grouping configuration properties into so-called profiles(dev, qa, prod) allowing us to activate a
+                             bunch of configurations based on the active profile.
+                           - Profiles are perfect for setting up our application for different environments, but they're also being used in another use cases
+                             like Bean creation based on a profile etc.
+                           - The default profile is always active.We can activate a specific profile using spring.profiles.active property
+                 NOTE:- An important point to consider is that once an application is built and packaged, it should not be modified. If any configuration
+                        changes are required, such as updating credentials or database handles, they should be made externally.
+ 
+                Q8. what is the difference between dev, qa and prod enviroment ? 
+                           - Dev environment → developers code likhne aur features banane/testing ke liye use karte hain.  
+                           - QA environment testers testing aur bug checking ke liye hota hai, 
+                           - jabki Production (Prod) environment real users ke actual use ke liye live system hota hai. 
+
+                Q11. How do you include one configuration file inside another in Spring Boot?  
+                           - spring.config.import additional config files ko load/import karta hai.jabki spring.profiles.active profile select karta hai (dev/qa/prod)
+                           - spring.config.import is generally written in application.properties / application.yml.
+                           - It is used to import one or multiple additional .properties / .yml configuration files.
+                           - Example : 
+                                      spring:
+                                        config:
+                                          import:
+                                            - "application_qa.yml"
+                                            - "application_prod.yml"
+
+                Q12. Difference between spring.profiles.active and spring.config.activate.on-profile?   
+                           - spring.profiles.active :
+                                            - Kaunsa profile active karna hai ye batata hai.
+                                            - Example :  
+                                                      spring:
+                                                        profiles:
+                                                          active:
+                                                            - dev
+                                                            - test    mtlb dev, test dono profile active hoga.
+                           - spring.config.activate.on-profile :
+                                            - Ye configuration kab apply hogi ye batata hai.
+                                            - Example application.yml:
+                                                                      spring:
+                                                                        config:
+                                                                          activate:
+                                                                            on-profile: dev
+
+                                                                      server:
+                                                                        port: 8081
+
+
+                Q13. How to externalize configurations using command-line arguments, JVM system properties, enviroment variables?
+                     - Command-line Arguments
+                          - Command-line arguments are configuration values passed when starting the application from the command line.
+                          - They are commonly used to override configuration without modifying the application code.
+                          - In Spring Boot, command-line arguments are automatically loaded into the Spring Environment.
+                          - They have the highest precedence among Spring Boot configuration sources.
+                          - These values can be accessed using:
+                                                        @Value
+                                                        Environment
+                                                        @ConfigurationProperties
+                          - Syntax:
+                                 --property-name=value
+                          - Examples:
+                                   java -jar jobportal.jar --server.port=9090 --spring.jpa.show-sql=false --spring.profiles.active=dev
+                    NOTE:- to test above different source of configuration follow these steps: Run Button (▶)ke bgl me → Three Dots (⋮) → Edit... →Modify Options...etc
+
+                     - JVM System Properties?
+                          - JVM System Properties are key-value pairs provided to the JVM at application startup.
+                          - They are used to configure the Java application without modifying the code.
+                          - In plain Java, they can be accessed using System.getProperty().
+                          - In Spring Boot, we usually don't call System.getProperty() directly because Spring Boot automatically loads JVM System Properties into the Spring Environment.
+                          - These values can be accessed using:
+                                                        @Value
+                                                        Environment
+                                                        @ConfigurationProperties
+                          - JVM System Properties are passed using the -D option.
+                          - Example:
+                                java —Dspring.jpa.show—sql = false jar jobportal.jar
+                                java -Dserver.port=9090
+                                java -Dserver.port=9090 -Dspring.jpa.show-sql=false -Dspring.profiles.active=dev -jar jobportal.jar
+
+                     - Environment Variables?
+                           - Environment variables are operating system-level variables used to store configuration outside the application.
+                           - They are popular for external configuration because they work across all operating systems.
+                           - In plain Java, they can be accessed using System.getenv().
+                           - In Spring Boot, we usually don't call System.getenv() directly because Spring Boot automatically loads environment variables into the Spring Environment.
+                           - These values can be accessed using:
+                                                               @Value
+                                                               Environment
+                                                               @ConfigurationProperties
+                           - To map an environment variable to a Spring property:
+                                      Change letters to uppercase
+                                      Replace dots (.) and dashes (-) with underscores (_)
+                                      Example: SPRING_JPA_SHOW_SQL -> maps to Spring property -> spring.jpa.show—sql 
+                                                                   'This automatic conversion is called relaxed binding in Spring Boot.'
+                                          Windows :
+                                                 env:SPRING_JPA_SHOW_SQL=fa1se; java -jar jobportal.jar  // single
+                                                 env:SPRING_JPA_SHOW_SQL="false"; env:SERVER_PORT="9090"; java -jar jobportal.jar // multiple
+                                          Linux based OS :
+                                                 env:SPRING_JPA_SHOW_SQL=fa1se; java -jar jobportal.jar
+
+                Q14. Drawbacks of externalized configurations using springboot alone ?
+                           - CLI arguments, JVM properties, and environment variables are effective ways to externalize configuration and maintain the immutability of 
+                             the application build. However, using these approaches often involves executing separate commands and manually setting up the application, 
+                             which can introduce potential errors during deployment.
+                           - Configuration Versioning & Auditing :
+                                                • Difficult to store, track, and audit configuration changes.
+                           - Access Control :
+                                                • Environment variables provide limited fine-grained access control.
+                           - Distributed Configuration :
+                                                • Managing configuration for multiple application instances becomes difficult.
+                           - Secrets Management :
+                                                • Spring Boot properties and environment variables do not provide built-in encryption for sensitive data like passwords and API keys.
+                           - Runtime Configuration Changes :
+                                                • Configuration changes may require an application restart to take effect.
+
+                Q15. What is spring cloud ?
+                           - Spring Cloud is a framework in the Spring ecosystem that provides various projects for developers to quickly build common patterns used in
+                             microservices.
+                           - Mainly used Spring Cloud projects :
+                                             | Project                      | Main use                                               |
+                                             | ---------------------------- | ------------------------------------------------------ |
+                                             | Spring Cloud Config          | Centralized configuration management                   |
+                                             | Spring Cloud Netflix Eureka  | Service discovery / service registration               |
+                                             | Spring Cloud Gateway         | API Gateway / routing                                  |
+                                             | Spring Cloud OpenFeign       | Service-to-service REST calls                          |
+                                             | Spring Cloud LoadBalancer    | Load balancing between service instances               |
+                                             | Spring Cloud Circuit Breaker | Handle service failures / fallback                     |
+                                             | Spring Cloud Bus             | Broadcast configuration changes/events across services |
+                                             | Spring Cloud Stream          | Event-driven communication with Kafka/RabbitMQ         |
+
+
+
+
+
+                                             • Spring Cloud Config(Centralized configuration management) :
+
+                                      - A centralized configuration server with Spring Cloud Config can overcome all the drawbacks that we discussed in the previous slide.
+                                      - Spring Cloud Config provides server and client-side support for externalized configuration in a distributed system.
+                                      - With the Config Server you have a central place to manage external properties for applications across all environments.
+                                      - Centralized configuration is mainly based on two core elements :
+                                             1. Configuration Data Store :
+                                                              - Stores all the configuration data in one central place.
+                                                              - Provides durability, version management, and potentially access control.
+                                                              - Example: GitHub, Database, File System.
+                                             2. Configuration Server :
+                                                              - Manages the configuration data stored in the data store.
+                                                              - Provides/distributes configuration to multiple applications or microservices.
+                                                              - Example: Spring Cloud Config Server.
+
+                                                           Microservices act as Config           Spring Cloud Config Server          Central repositories where
+                                                           clients & load configurations         load all the configurations by      properties get stored                                
+                                                           during startup by connecting          connecting to central repository                |
+                                                           to Configuration service                       |                                      |
+                                                                   |                                      |                                      |
+                                                                   |                                      |                                      |
+                                                                   V                                      V                                      V
+                                                                MICROSERVICES                         CONFIG SERVER                     CENTRAL REPOSITORIES      
+                                                           . . . . . . . . . . . . . . . .    . . . . . . . . . . . . . . . .      . . . . . . . . . . . . . . .
+                                                           .                              .    .                              .    .                             .
+                                                           .   +----------------------+   .    .   +----------------------+   .    .   +----------------------+  .
+                                                           .   |  Accounts Service   |    .    .   |                      |   .    .   |       Database       |  .
+                                                           .   +----------------------+   .    .   |   Spring Cloud       |   .    .   +----------------------+  .
+                                                           .                              .    .   |   Config Server      |   .    .                             .
+                                                           .   +----------------------+   .    .   |                      |   .    .   +----------------------+  .
+                                                           .   |    Loans Service    |    .    .   +----------------------+   .    .   |       GitHub         |  .
+                                                           .   +----------------------+   .    .                              .    .   +----------------------+  .
+                                                           .                              .    .                              .    .                             .
+                                                           .   +----------------------+   .    .                              .    .   +----------------------+  .
+                                                           .   |    Cards Service    |    .    .                              .    .   | File System /       |   .
+                                                           .   +----------------------+   .    .                              .    .   |    Classpath        |   .
+                                                           .                              .    .                              .    .   +----------------------+  .
+                                                           . . . . . . . . . . . . . . . .     . . . . . . . . . . . . . . . .     . . . . . . . . . . . . . . . .
+                                      - Where do we configure the encryption key in the Config Server?
+                                                     We configure the encryption key using encrypt.key in the Config Server's configuration.
+                                                     Example :
+                                                                        spring:
+                                                                          mail:
+                                                                            username: myemail@gmail.com
+                                                                            password: {cipher}A1B2C3D4E5...
+                                      - How do we identify an encrypted configuration value in the Git repository?
+                                                      We prefix the encrypted value with {cipher} to indicate that it is encrypted.
+                                      - How do we encrypt sensitive configuration data using the Config Server?
+                                                      We send the sensitive value to the Config Server's /encrypt endpoint, 
+                                                      such as 
+                                                            http://localhost:8071/encrypt
+                                                            http://localhost:8071/decrypt
+
+                         PROBLEM-1: What should you do if you update a configuration in the Git repository but don't want to restart the running microservice?
+                                       CONCEPT : 
+                                         Refresh configurations at runtime using '/refresh' path of actuator    eg: http://localhost:8080/actuator/refresh
+
+                                        - In a typical Spring Boot application, modifying a property would require a restart. However, Spring Cloud Config introduces 
+                                          the capability to dynamically refresh the configuration in client applications during runtime. 
+                                        - When a change is pushed to the configuration repository, all integrated applications connected to the config server can be 
+                                          notified, prompting them to reload the relevant portions affected by the configuration modification.
+                                        - Let's see an approach for refreshing the configuration, which involves sending a specific POST request to a running instance 
+                                          of the microservice. This request will initiate the reloading Of the modified configuration data, enabling a hot reload Of the
+                                          application. 
+                                        - Below are the steps to follow :
+                                               1. Add actuator dependency in the Config Client services.
+                                               2. Enable /refresh API : 
+                                                                   - The Spring Boot Actuator library provides a configuration endpoint called "/actuator/refresh" that
+                                                                     can trigger a refresh event. By default, this endpoint is not so you need to explicitly enable it 
+                                                                     in the application.yml file.
+                                                                                             management:
+                                                                                               endpoints:
+                                                                                                 web:
+                                                                                                   exposure:
+                                                                                                     include: refresh 
+                                                  NOTE:- sare microservice me indivisually http://localhost:8080/actuator/refresh  hit krna pdega
+                
+                Q17. Which property value is used to load configuration files from the classpath in Spring Cloud Config Server? 
+                               - with spring.cloud.config.server.native.search-locations configuration property classpath:/config is used to load configuration files 
+                                 from the classpath.
+
+                Q18. Which property value is used to load configuration files from the local file system in Spring Cloud Config Server?  
+                               - with spring.cloud.config.server.native.search-locations configuration property file:///C://Users//meraz//Desktop//sam//config is 
+                                 used to load configuration files from the local file system.
+
+                Q19. Which property is used to configure a Git repository location in Spring Cloud Config Server?  
+                               - with spring.cloud.config.server.git.uri eg- spring.cloud.config.server.git.uri=https://github.com/eazybytes/eazybytes-config.git
+
+                         PROBLEM-2: Suppose you have multiple instances of a microservice. If you use /actuator/refresh, only one instance gets the updated configuration.
+                                    How can you refresh the configuration of all instances with a single request?
+                                       CONCEPT : 
+                                         Refresh configurations at runtime using Spring Cloud Bus  eg : http://localhost:8080/actuator/busrefresh
+
+                              - Spring Cloud Bus, available at https://spring.io/projects/sprin g-cloud-bus, helps easy communication between all connected application
+                                instances by providing a simple/easy way to send events/messages.
+                              - It offers an implementation for AMQP brokers / message brokers,such as RabbitMQ,and Kafka,helping efficient communication across the 
+                                different applications.
+                              - its basically inter-link all microservices instance with light wieght message broker like, RabbitMQ. becoz of that need once referesh
+                                bus api.
+
+                     - What is RabbitMQ and how to setup?  
+                            - RabbitMQ ek message broker hai jo applications/services ke beech messages ko send aur receive karne ka kaam karta hai.
+                            - url to visit RabbitMQ website:   https://www.rabbitmq.com
+
+                     - Below are the steps to implements :
+                            1. Add actuator dependency in the Config Server & Client services: 
+                                     - Add Spring Boot Actuator dependency inside pom.xml of the individual microservices like accounts, loans and cards to expose the 
+                                         /busrefresh endpoint
+                            2. Enable / busrefresh API :
+                                     - The Spring Boot Actuator library provides a configuration endpoint called "/actuator/busrefresh" that can trigger a refresh event. 
+                                       By default, this endpoint is not exposed, so you need to explicitly enable it in the application.yml file 
+                                     - Example :
+                                                  management:
+                                                      endpoints:
+                                                          web:
+                                                            exposure:
+                                                              include: busrefresh
+                            3. Add Spring Cloud Bus dependency in the Config Server & Client services:
+                                     - Add Spring Cloud Bus dependency (spring-cloud-starter-bus-amqp) inside pom.xml of the individual microservices like accounts,
+                                       loans, cards and Config server
+                                                                    <dependency>
+                                                                        <groupId>org.springframework.cloud</groupId>
+                                                                        <artifactId>spring-cloud-starter-bus-amqp</artifactId>
+                                                                    </dependency> 
+                            4. Set up a RabbitMQ: 
+                                     - go to website : https://www.rabbitmq.com
+                                     - copy commnad : docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:4-management
+                                     - If the service is not started with default values, then configure the rabbitmq connection details in the application.yml file of
+                                       all the individual microservices and Config server :
+                                                                                         spring:
+                                                                                           rabbitmq:
+                                                                                             host: "localhost"
+                                                                                             port: 5672
+                                                                                             username: "guest"
+                                                                                             password: "guest"
+                                                  NOTE:- kisi v ek microservice me http://localhost:8080/actuator/bushrefresh  hit krna pdega or sare me kam ho jayega.
+                                                         so  still there is a single manual step involved which is invoking the /actuator/busrefresh on any of the 
+                                                         microservice instance.                     
+
+                     - What is webhook ?  
+                            - Webhook ek mechanism hai of github jisme: jab kisi application me koi event hota hai, to wo automatically tumhare backend API ko HTTP 
+                              request bhej deti hai.
+
+
+                         PROBLEM-2: Suppose you have configured Spring Cloud Config Server with a Git repository. Whenever a developer pushes a new configuration change
+                                    to GitHub, you want all running microservice instances to automatically receive the updated configuration without manually calling 
+                                    /actuator/refresh or /actuator/busrefresh. How can you achieve this?
+
+                                       CONCEPT : 
+                                         Refresh configurations at runtime using Spring Cloud Bus & Spring Cloud Config Monitor.
+
+                              - Spring Cloud Config offers the Monitor library, which enables the triggering Of configuration change events in the Config Service.
+                              - By exposing the /monitor endpoint, it facilitates the propagation of these events to all listening applications via the Bus.
+                              - The Monitor library allows push notifications from code repository providers such as GitHub, GitLab, and Bitbucket.
+                              - You can configure in these services to automatically send a POST request to the Config Service after each new push to the configuration
+                                repository. 
+
+                     - Below are the steps to implements :
+                            1. Add actuator dependency in the Config Server & Client services: 
+                                     - Add Spring Boot Actuator dependency inside pom.xml of the individual microservices like accounts, loans and cards to expose the 
+                                         /busrefresh endpoint
+                            2. Enable / busrefresh API :
+                                     - The Spring Boot Actuator library provides a configuration endpoint called "/actuator/busrefresh" that can trigger a refresh event. 
+                                       By default, this endpoint is not exposed, so you need to explicitly enable it in the application.yml file 
+                                     - Example :
+                                                  management:
+                                                      endpoints:
+                                                          web:
+                                                            exposure:
+                                                              include: busrefresh
+                            3. Add Spring Cloud Bus dependency in the Config Server & Client services:
+                                     - Add Spring Cloud Bus dependency (spring-cloud-starter-bus-amqp) inside pom.xml of the individual microservices like accounts,
+                                       loans, cards and Config server
+                                                                    <dependency>
+                                                                        <groupId>org.springframework.cloud</groupId>
+                                                                        <artifactId>spring-cloud-starter-bus-amqp</artifactId>
+                                                                    </dependency>
+
+                            4. Add Spring Cloud Config monitor dependency in the Config Server : 
+                                      - Add Spring Cloud Config monitor dependency (spring-cloud-config-monitor) inside pom.xml of Config server and this exposes
+                                        /monitor endpoint
+                                      - only in config server.
+                                                                    <dependency>
+                                                                        <groupId>org.springframework.cloud</groupId>
+                                                                        <artifactId>spring-cloud-config-monitor</artifactId>
+                                                                    </dependency>
+ 
+                            5. Set up a RabbitMQ: 
+                                     - go to website : https://www.rabbitmq.com
+                                     - copy commnad : docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:4-management
+                                     - If the service is not started with default values, then configure the rabbitmq connection details in the application.yml file of
+                                       all the individual microservices and Config server :
+                                                                                         spring:
+                                                                                           rabbitmq:
+                                                                                             host: "localhost"
+                                                                                             port: 5672
+                                                                                             username: "guest"
+                                                                                             password: "guest"
+                            5. Set up a WebHook in GitHub: 
+                                     - Set up a webhook to automatically send a POST request to Config Service /monitor path after each new push to the config repo.
+                                     - GitHub Repo(configuration files of all microservices) → Settings → Webhooks → Add Webhook → Payload URL → Config Server /monitor.
+                                 - How can you test the GitHub Webhook locally if the Config Server /monitor endpoint is running on localhost?
+                                            - GitHub cannot directly access our localhost, so we can use Hookdeck to create a public URL that forwards webhook requests
+                                              to our local Config Server /monitor endpoint.
+                                            - STEPS:
+                                                  1. https://hookdeck.com/
+                                                  2. hookdeck.com → Products → Console → Add Destination → Localhost → Windows → Run the provided commands
+                                                     not asking for forward path then run : hookdeck listen 8071 source --cli-path /monitor
+
+                                                  NOTE:- here by web hook /bushrefesh will be called if any push on github.              
+
+
+                Q26. What are the difference between Actuator refresh API, Spring Cloud Bus refresh and Webhook ? 
+                              - Actuator refresh API → Ek microservices ko manually bolo “apni new config dubara load karo, 
+                              - Spring Cloud Bus refresh → Ek jagah refresh karo aur sab apps automatically refresh ho jayein. 
+                              - Webhook→ Kuch event hote hi ek app khud doosri app ko message/request bhej de. 
+
+
+                Q1. Docker Compose ka IMPORTANT RESERVED KEYWORDS ?
+                             | Keyword        | Meaning                 |
+                             |----------------|-------------------------|
+                             | services       | All containers          |
+                             | image          | Docker image            |
+                             | ports          | Port mapping            |
+                             | environment    | Environment variables   |
+                             | depends_on     | Service dependency      |
+                             | healthcheck    | Health monitoring       |
+                             | networks       | Network attachment      |
+                             | container_name | Fixed container name    |
+                             | deploy         | Deployment configuration|
+                             | resources      | CPU/RAM settings        |
+                             | limits         | Maximum resource limits |
+                             | hostname       | Internal hostname       |
+
+                                     services :
+                                             → Docker Compose ka keyword hai jo application ki services/containers define karne ke liye use hota hai.
+                                     image :
+                                             → Batata hai ki container banane ke liye kaunsi Docker image use hogi.
+                                     ports :
+                                             → Host machine aur container ke beech port mapping configure karne ke liye use hota hai.
+                                     environment :
+                                             → Container ke andar environment variables provide karne ke liye use hota hai.
+                                     depends_on :
+                                             → Ek service ko doosri service par dependent banata hai. Example: App → Database
+                                     healthcheck :
+                                             → Docker ko batata hai ki container/service healthy hai ya unhealthy. Example: Spring Boot ka /actuator/health endpoint check karna.
+                                     networks :
+                                             → Containers ko ek network se connect karke unhe aapas mein communicate karne deta hai.
+                                               Note: networks section mein actual Docker network define/create kiya ja sakta hai.
+                                     container_name :
+                                             → Container ko custom/fixed naam dene ke liye use hota hai.
+                                     deploy :
+                                             → Service ke deployment/runtime configuration ko define karta hai, jaise resources, replicas aur restart behavior.
+                                     resources :
+                                             → Container ko available CPU/RAM resources ki configuration define karta hai.
+                                     limits :
+                                             → Container maximum kitna CPU/RAM use kar sakta hai,uski limit define karta hai.
+                                     hostname :
+                                             → Container ke andar uska internal hostname set karta hai.
+
+                       - Docker network 'drivers' main types :
+                                  | Driver  | Simple Meaning                                                   |
+                                  | ------- | ---------------------------------------------------------------- |
+                                  | bridge  | Same Docker host ke containers ko aaps me connect karta hai      |
+                                  | host    | Container host machine ka network directly use karta hai         |
+                                  | none    | Container ko network connectivity nahi deta                      |
+                                  | overlay | Multiple Docker hosts ke containers ko connect karta hai         |
+
+
+                Q28. Explain liveness and readness probes ? 
+                         NOTE:- ye general topic hai ye tools like, docker,kubernetes and cloud platfor me use hota hai. or yha cloud config ke liye.
+                            - Liveness :
+                                      - A liveness probe sends a signal that the container or application is either alive (passing) or dead (failing).
+                                      - If the container is alive, then no action is required because the current state is good.
+                                      - If the container is dead, then an attempt should be made to heal the application by restarting it.
+                                      - In simple words, liveness answers a true-or-false question: "Is this container alive?"
+                            - Readiness :
+                                      - A readiness probe used to know whether the container or app being probed is ready to start receiving network traffic.
+                                      - If your container enters a state where it is still alive but cannot handle incoming network traffic (a common scenario during startup), 
+                                        you want the readiness probe to fail. So that, traffic will not be sent to a container which isn't ready for it.
+                                      - In simple words, readiness answers a true-or-false question: "Is this container ready to receive network traffic ?"
+
+                       NOTE:- Inside Spring Boot apps, actuator gathers the "Liveness" and "Readiness" information from the ApplicationAvailability
+                              inside configserver need to enable liveness and readiness property :
+                                                                                                health:
+                                                                                                    readiness-state:
+                                                                                                      enabled: true
+                                                                                                    liveness-state:
+                                                                                                      enabled: true
+                                                                                                  endpoint:
+                                                                                                    health:
+                                                                                                      probes:
+                                                                                                        enabled: true   
+                            URL to to test :    
+                                   http://localhost:8071/actuator/health   
+                                   http://localhost:8071/actuator/health/liveness
+                                   http://localhost:8071/actuator/health/readiness                        
+
+
+                        - REPLACING h2 DB WITH MYSQL :
+                                  - to run mysql image as conainer :
+                                                     docker run -p 3306:3306 --name accountsdb -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=accountsdb -d mysql
+                                  - to tell always try to execute the script of schema.sql becoz in real DB spring boot expect to run mannualy :
+                                                 spring:
+                                                     datasource:
+                                                        sql:
+                                                          init:
+                                                            mode: always
+
+
+
+SECTION 08 :
+        SERVICE DISCOVERY AND SERVICE REGISTRATION IN MICROSERVICES
+-------------------------------------------------------------------
+
+                                                         • SERVICE REGISTRATION & DISCOVERY :
+
+                              - STORY BEFORE LEARNING SERVICE DISCOVERY :
+                                    suppose right now we have 3 microservices so first we will deploy our all microservices into comman microservice network because 
+                                    there are two types of traffic/communication one is external communication/traffic which we achieve with API gateway and another one
+                                    is internal traffic/communication because may be one microservice depends on another microservice.
+                                    Ek common network jisme saare microservice/containers aapas me communicate kar sakein.called Microservice network.
+
+                Q2. What are the challenges comes for internal communication of microservices? 
+                          CHALLENGE-5 : 
+                                - HOW DO SERVICES LOCATE EACH OTHER INSIDE A NETWORK?:
+                                       Each instance of a microservice exposes a remote API with it's own host and port. how do other microservices & clients know about
+                                       these dynamic endpoint URLs to invoke them. So where is my service?
+                                - HOW DO NEW SERVICE INSTANCE ENTER INTO THE NETWORK? :
+                                       If an microservice instance fails, new instances Will be brought online to ensure constant availability. This means that the IP 
+                                       addresses of the instances can be constantly changing So how does these new instances can start serving to the clients?
+                                - LOAD BALANCE, INFO SHARIN B/W MICROSERVICE INSTANCES :
+                                       How do we make sure to properly load balance b/w the multiple microservice instances especially a microservice is invoking another
+                                       microservice? How do a specific service information shared across the network?
+
+                         - These challenges in microservices can be solved using below concepts or solutions, 
+                                                                             1) Service discovery
+                                                                             2) Service registration
+                                                                             3) Load balancing
+                       - before moving to above three solutions lets know below things, :
+                              - How service communication happens in Traditional apps ?: 
+                                          - Inside web network, When a service/app want to communicate with another service/app, it must be given the necessary information
+                                            to locate it,such as an IP address or a DNS name. Let's examine the scenario Of two services, Accounts and Loans. If there 
+                                            was only a single instance Of Loans microservice
+
+                                              Upstream Service                                                             Downstream Service
+                                         .-------------------------.                                                    .-----------------------.
+                                         |                         | Internal communication between microservices using |                       |
+                                         |                         | hostname, DNS or IP address                        |                       |
+                                         |   Accounts Microservice |<-------------------------------------------------->|   Loans Microservice  |
+                                         |                         | No Service Discovery or Load Balancing involved    |                       |
+                                         '-------------------------'                                                    '-----------------------'
+                                                                                                                            127.54.37.2
+                                                Loans microservice will be a backing service with respect to Accounts microservice
+
+                                          - When there is only one instance of the Loans microservice running, managing the DNS name and its corresponding IP address 
+                                            mapping is straightforward. However, in a cloud environment, it is common to deploy multiple instances Of a service, with 
+                                            each instance having its own unique IP address.
+                                          - TO address this challenge, one approach is to update DNS records with multiple IP addresses and rely on round-robin name 
+                                            resolution. This method directs requests to one of the IP addresses assigned to the service replicas in a rotating manner. 
+                                            However, this approach may not suitable for microservices, as containers or services change frequently. This rapid change 
+                                            makes it difficult to maintain accurate DNS records and ensure efficient communication between microservices.
+
+                              - How Traditional LoadBalancers works ?: 
+                                          - look inside madan reddy notes for diagram visiualization. 
+
+                              - Limitations with Traditional LoadBaIancers ? :
+                                         - With traditional approach each instance of a service used to be deployed in one or more application servers. The number Of 
+                                           these application servers was Often static and even in the case Of restoration it would be restored to the same state with 
+                                           the same IP and other configurations.
+                                         - While this type Of model works well with monolithic and SOA based applications with a relatively small number of services 
+                                           running on a group of static servers, it doesn't work well for cloud-based microservice applications for the following 
+                                           reasons,
+                                                  - Limited horizontal scalability & licenses costs
+                                                  - Single point of failure & Centralized chokepoints
+                                                  - Manually managed to update any IPs, configurations
+                                                  - Complex in nature & not containers friendly
+                                        NOTE:- The biggest challenge with traditiona load balancers is that some one has to manually maintain the routing tables which 
+                                               is an impossible task inside the microservices network. Because containers/services are ephemeral in nature
+                              - How to solve the problem for cloud native applications ?
+                                         - 
+                
+
+
+                
+
+        
+                Q8. Explain client side service discovery and client side load balancing ?
+                Q9. How client side service discovery works ?
+                Q10. How loadbalancing works in client side service discovery ?
+                Q11. How does spring cloud support client side service discovery in microservices?
+                Q12. What are the steps to build Eureka Server ?
+                Q13. What are the steps to register a microservice as a Eureka Client ?
+                Q14. How to shutdown running application gracefully so that it shutdown and also de-register from eureka ?   for this call actuator url like, http://localhost:{port}/actuator/shutdown 
+                Q15. How does Eureka Server know whether a service instance is alive or down? Netflix Eureka automatically heartbeat receive karta rehta hai (default every 30 sec); agar 90 sec tak heartbeat na aaye to service ko DOWN maan leta hai.jabki individual microservices automatically heartbeat bhejte rehte hain to Netflix Eureka.
+                Q16. What is Feign clients ?
+                Q17. What is Eureka self-preservation mode ?
+                Q18. How does eureka self-preservation mode avoid network traps ?
+
+                                             • ROUTING & TRACING :
+                                             • LOAD BALANCING : 
+                                             • SPRING CLOUD SECURITY :
+                                             • DISTRIBUTED TRACING & MESSAGING
+                                             • 
+                                             • 
+                                             • 
+
+
+
+
+SECTION 09 :
+        Gateway,Routing & Cross Cutting concerns in Microservices
+-----------------------------------------------------------------
+                Q1. What is an API Gateway/Edge server and how does it help in solving challenges like maintaining a single entry point, handling cross cutting concerns and implementing dynamic routing in Microservices architecuter ?
+                Q2. What are the few important tasks that API Gateway does ?
+                Q3. What is spring cloud gateway ?
+                Q4. Explain spring cloud gateway internal architecture ?
+                Q5. What are the steps to create spring cloud gateway project ?
+                Q6. Why do we enable spring.cloud.gateway.server.webflux.discovery.locator.enabled=true in Spring Cloud Gateway?  It enables automatic route creation in Spring Cloud Gateway using services registered in Netflix Eureka.
+                Q7. What is the use of lowerCaseServiceId=true in Spring Cloud Gateway?  It converts service IDs to lowercase while creating routes, so URLs become cleaner and consistent like /accounts/** instead of /ACCOUNTS/**.
+                Q8. What are the different variations of API Gateway pattern ? 
+SECTION 10 :
+        MAKING MICROSERVICES RESILIENT
+--------------------------------------
+                Q1. What is the meaning of Resilience ?  Difficult situation, failure, pressure, ya problem ke baad bhi quickly recover karne ki ability.
+                Q1. What are the challenges comes for Resilience in microservices and what library give the solutions?
+                Q1. What are the pattern resilience4j provides ?
+                Q1. Explain Circuit Breaker ?
+                Q1. What are the states of circuit breaker pattern ?
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 
+                Q1. 
+                Q1.
+                Q1. 
+                Q1.
+                Q1. START FROM 139  NO. VIDEO 
+SECTION 09 :
+        Gateway,Routing & Cross Cutting concerns in Microservices
+-----------------------------------------------------------------
+                Q1. 
+                Q1. 
+                Q1. 
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 
+SECTION 09 :
+        Gateway,Routing & Cross Cutting concerns in Microservices
+-----------------------------------------------------------------
+                Q1. 
+                Q1. 
+                Q1. 
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 
+SECTION 15 :
+          CONTAINER ORCHESTRATION USING KUBERNETES 
+---------------------------------------------------
+                Q1. 
+                Q1. 
+                Q1. 
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 

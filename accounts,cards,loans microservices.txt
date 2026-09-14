@@ -1,0 +1,244 @@
+                                                                            ACCOUNTS MICROSERVICE 
+                                                                      ---------------------------------
+
+                                                          src
+                                                          └── main
+                                                              ├── java
+                                                              │   └── com.eazybytes.accounts
+                                                              │       ├── audit
+                                                              │       │   └── AuditAwareImpl
+                                                              │       │
+                                                              │       ├── constants
+                                                              │       │   └── AccountsConstants
+                                                              │       │
+                                                              │       ├── controller
+                                                              │       │   └── AccountsController
+                                                              │       │
+                                                              │       ├── dto
+                                                              │       │   ├── AccountsDto
+                                                              │       │   ├── CustomerDto
+                                                              │       │   ├── ErrorResponseDto
+                                                              │       │   └── ResponseDto
+                                                              │       │
+                                                              │       ├── entity
+                                                              │       │   ├── Accounts
+                                                              │       │   ├── BaseEntity
+                                                              │       │   └── Customer
+                                                              │       │
+                                                              │       ├── exception
+                                                              │       │   ├── CustomerAlreadyExistsException
+                                                              │       │   ├── GlobalExceptionHandler
+                                                              │       │   └── ResourceNotFoundException
+                                                              │       │
+                                                              │       ├── mapper
+                                                              │       │   ├── AccountsMapper
+                                                              │       │   └── CustomerMapper
+                                                              │       │
+                                                              │       ├── repository
+                                                              │       │   ├── AccountsRepository
+                                                              │       │   └── CustomerRepository
+                                                              │       │
+                                                              │       ├── service
+                                                              │       │   └── AccountsService
+                                                              │       │
+                                                              │       └── AccountsApplication
+                                                              │
+                                                              └── resources
+                                                                  ├── application.yaml
+                                                                  └── schema.sql
+
+
+Accounts Microservice – Functionality
+
+• Customer Registration
+    • Customer ka name, email, mobileNumber save karta hai.
+    • Mobile number ke basis par check karta hai ki customer already registered hai ya nahi.
+
+• Account Creation
+    • Customer successfully create hone ke baad uske liye new bank account create hota hai.
+    • Account details:
+        • accountNumber
+        • customerId
+        • accountType
+        • branchAddress
+    • Account number randomly generate kiya ja raha hai.
+    • Default account type Savings hai.
+
+• Fetch Account
+    • mobileNumber se customer ko find karta hai.
+    • Customer ke customerId se uska Account find karta hai.
+    • Customer + Account details ko ek saath CustomerDto me return karta hai.
+
+• Update Account
+    • accountNumber se existing Account find karta hai.
+    • Account details update karta hai.
+    • Saath hi associated Customer ki details bhi update karta hai.
+
+• Delete Account
+    • mobileNumber se Customer find karta hai.
+    • Customer ke customerId se Account delete karta hai.
+    • Uske baad Customer ko bhi delete karta hai.
+
+              NOTE: look codes for more understanding.
+
+
+
+
+
+                                                                            LOANS MICROSERVICE 
+                                                                      ---------------------------------
+
+                                                              src
+                                                              └── main
+                                                                  ├── java
+                                                                  │   └── com.eazybytes.loans
+                                                                  │       ├── audit
+                                                                  │       │   └── AuditAwareImpl
+                                                                  │       │
+                                                                  │       ├── constants
+                                                                  │       │   └── LoansConstants
+                                                                  │       │
+                                                                  │       ├── controller
+                                                                  │       │   └── LoansController
+                                                                  │       │
+                                                                  │       ├── dto
+                                                                  │       │   ├── ErrorResponseDto
+                                                                  │       │   ├── LoansDto
+                                                                  │       │   └── ResponseDto
+                                                                  │       │
+                                                                  │       ├── entity
+                                                                  │       │   ├── BaseEntity
+                                                                  │       │   └── Loans
+                                                                  │       │
+                                                                  │       ├── exception
+                                                                  │       │   ├── GlobalExceptionHandler
+                                                                  │       │   ├── LoanAlreadyExistsException
+                                                                  │       │   └── ResourceNotFoundException
+                                                                  │       │
+                                                                  │       ├── mapper
+                                                                  │       │   └── LoansMapper
+                                                                  │       │
+                                                                  │       ├── repository
+                                                                  │       │   └── LoansRepository
+                                                                  │       │
+                                                                  │       ├── service
+                                                                  │       │   ├── impl
+                                                                  │       │   │   └── LoansServiceImpl
+                                                                  │       │   └── ILoansService
+                                                                  │       │
+                                                                  │       └── LoansApplication
+                                                                  │
+                                                                  └── resources
+                                                                      ├── application.yaml
+                                                                      └── schema.sql
+
+Loans Microservice – Functionality
+
+• Loan Creation
+    • Customer ke mobileNumber ke basis par loan create karta hai.
+    • Check karta hai ki given mobileNumber par loan already registered hai ya nahi.
+    • Agar loan already exist karta hai to LoanAlreadyExistsException throw karta hai.
+    • New loan create hone par:
+        • loanNumber randomly generate hota hai.
+        • mobileNumber customer ka save hota hai.
+        • Default loanType Home Loan hota hai.
+        • totalLoan new loan limit ke according set hota hai.
+        • amountPaid initially 0 hota hai.
+        • outstandingAmount initially totalLoan ke equal hota hai.
+
+• Fetch Loan
+    • mobileNumber se existing loan find karta hai.
+    • Agar loan nahi milta hai to ResourceNotFoundException throw karta hai.
+    • Loan details ko LoansDto me convert karke return karta hai.
+
+• Update Loan
+    • loanNumber ke basis par existing loan find karta hai.
+    • Loan details ko LoansDto ke according update karta hai.
+    • Updated loan ko database me save karta hai.
+
+• Delete Loan
+    • mobileNumber se existing loan find karta hai.
+    • Loan ke loanId ke basis par loan ko database se delete karta hai.
+    • Loan successfully delete hone par true return karta hai.
+
+
+
+
+                                                                            CARDS MICROSERVICE 
+                                                                      ---------------------------------
+
+
+
+                                                                  src
+                                                                  └── main
+                                                                      ├── java
+                                                                      │   └── com.eazybytes.cards
+                                                                      │       ├── audit
+                                                                      │       │   └── AuditAwareImpl
+                                                                      │       │
+                                                                      │       ├── constants
+                                                                      │       │   └── CardsConstants
+                                                                      │       │
+                                                                      │       ├── controller
+                                                                      │       │   └── CardsController
+                                                                      │       │
+                                                                      │       ├── dto
+                                                                      │       │   ├── CardsDto
+                                                                      │       │   ├── ErrorResponseDto
+                                                                      │       │   └── ResponseDto
+                                                                      │       │
+                                                                      │       ├── entity
+                                                                      │       │   ├── BaseEntity
+                                                                      │       │   └── Cards
+                                                                      │       │
+                                                                      │       ├── exception
+                                                                      │       │   ├── CardAlreadyExistsException
+                                                                      │       │   ├── GlobalExceptionHandler
+                                                                      │       │   └── ResourceNotFoundException
+                                                                      │       │
+                                                                      │       ├── mapper
+                                                                      │       │   └── CardsMapper
+                                                                      │       │
+                                                                      │       ├── repository
+                                                                      │       │   └── CardsRepository
+                                                                      │       │
+                                                                      │       ├── service
+                                                                      │       │   ├── impl
+                                                                      │       │   │   └── CardsServiceImpl
+                                                                      │       │   └── ICardsService
+                                                                      │       │
+                                                                      │       └── CardsApplication
+                                                                      │
+                                                                      └── resources
+                                                                          ├── application.yaml
+                                                                          └── schema.sql
+
+
+Cards Microservice – Functionality
+
+• Card Creation
+    • Customer ke mobileNumber ke basis par card create karta hai.
+    • Check karta hai ki given mobileNumber par card already registered hai ya nahi.
+    • Agar card already exist karta hai to CardAlreadyExistsException throw karta hai.
+    • New card create hone par:
+        • cardNumber randomly generate hota hai.
+        • mobileNumber customer ka save hota hai.
+        • Default cardType Credit Card hota hai.
+        • totalLimit new card limit ke according set hota hai.
+        • amountUsed initially 0 hota hai.
+        • availableAmount initially totalLimit ke equal hota hai.
+
+• Fetch Card
+    • mobileNumber se existing card find karta hai.
+    • Agar card nahi milta hai to ResourceNotFoundException throw karta hai.
+    • Card details ko CardsDto me convert karke return karta hai.
+
+• Update Card
+    • cardNumber ke basis par existing card find karta hai.
+    • Card details ko CardsDto ke according update karta hai.
+    • Updated card ko database me save karta hai.
+
+• Delete Card
+    • mobileNumber se existing card find karta hai.
+    • Card ke cardId ke basis par card ko database se delete karta hai.
+    • Card successfully delete hone par true return karta hai.

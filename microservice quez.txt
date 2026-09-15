@@ -1448,7 +1448,151 @@ SECTION 08 :
                                         NOTE:- The biggest challenge with traditiona load balancers is that some one has to manually maintain the routing tables which 
                                                is an impossible task inside the microservices network. Because containers/services are ephemeral in nature
                               - How to solve the problem for cloud native applications ?
-                                         - 
+                                         - For cloud native applications, service discovery is the perfect solution. It involves tracking and storing information about
+                                           all running service instances in a service registry. (Service Discovery = poora mechanism/process  , Service Registry = ek 
+                                                                                                  jagah/database jahan services ki information store hoti hai )
+                                         - Whenever a new instance is created, it should be registered in the registry, and when it is terminated, it should be 
+                                           properly removed automatically.
+                                         - The registry acknowledges that multiple instances of the same application can be active simultaneously. When an application
+                                           needs to communicate with a backing service, it performs a lookup in the registry to determine the IP address to connect to. 
+                                           If multiple instances are available, a load-balancing strategy is used to evenly distribute the workload among them.
+                                           Client-side service discovery and server-side service discovery are distinct approaches that address the service discovery 
+                                           problem in different contexts
+                                         - In a modern microservice architecture, knowing the right network location of an application is a much more complex problem 
+                                           for the clients as service instances might have dynamically assigned IP addresses.Moreover the number instances may vary due
+                                           to autoscaling and failures.
+                                         - Microservices service discovery & registration is a way for applications and microservices to locate each other on a network.
+                                           This includes,
+                                                     - A central server (or servers) that maintain a global view of addresses.
+                                                     - Microservices/clients that connect to the central server to register their address when they start & ready
+                                                     - Microservices/clients need to send their heartbeats at regular intervals to central server about their health
+                                                     - Microservices/clients that connect to the central server to deregister their address when they are about to shutdown
+
+                                          NOTE:- Service discovery & registrations deals with the problems about how microservices talk to each other, i.e. perform API calls.
+
+                       - Client-side service discovery and load balancing :
+                                     - In client-side service discovery, applications are responsible for registering themselves with a service registry during startup
+                                       and unregistering when shutting down. When an application needs to communicate with a backing service, it queries the service 
+                                       registry for the associated IP address. If multiple instances of the service are available, the registry returns a list of IP 
+                                       addresses. The client application then selects one based on its own defined load-balancing strategy. Below figure illustrates 
+                                       the workflow Of this process.
+                                                                                                     (1) Loans service registers with Service Registry during startup
+                                                                                                          & send regular heart beats
+                                                                                                                      |
+                                                                                                                      |
+                                                                                                                      v
+                         .-----------------------. <----------------------------------------------------------------------------------------------.
+                         |                       |                                                                                                |
+                         |   Service Registry    |                                                                                                |
+                         |                       |                                                                                                |
+                         '-----------------------'                                                                                                |
+                                   ^       |                                                                                                      |
+                                   |       |                                                                                                      |
+                    (2)            |       |  (3)                                                                                                 |
+        Dude, what are address     |       |     Buddy, here are the IP                                                                           |
+        details of loans service?  |       |      address of Loans instances,                                                                     |
+                                   |       |                                                                                                      |
+                                   |       |       127.54.37.23                                                    .-----------------------.      |
+                                   |       |       127.54.37.24                                      .------------>|   Loans Microservice  |------|
+                                   |       v                                                         |             |    127.54.37.23       |      |
+                         .-----------------------.                                                   |             '-----------------------'      |
+                         |                       |                                                   |                                            |
+                         | Accounts Microservice |---------------------------------------------------|                                            |
+                         |                       |  (4) Accounts microservice is going to invoke one |                                            |
+                         '-----------------------'      of the instance of loans based on the load   |                                            |
+                                                         balancing strategy configured               |              .-----------------------.     |
+                                                                                                     '------------->|   Loans Microservice  |-----'
+                                                                                                                    |     127.54.37.24      |
+                                                                                                                    '-----------------------'
+
+                                     - Client-side service discovery is an architectural pattern where client applications are responsible for locating and connecting 
+                                       to services they depend on. In this approach, the client application communicates directly with a service registry to discover 
+                                       available service instances and obtain the necessary information to establish connections.
+                                     - Here are the key aspects of client-side service discovery:
+                                                 - Service Registration: 
+                                                                - Client applications register themselves with the service registry upon startup. They provide essential
+                                                                  information about their location, such as IP address, port, and metadata, which helps identify and 
+                                                                  categorize the service.
+                                                 - Service Discovery: 
+                                                                - When a client application needs to communicate with a specific service,it queries the service registry
+                                                                  for available instances of that service. The registry responds with the necessary information, such 
+                                                                  as IP addresses and connection details.
+                                                 - Load Balancing: 
+                                                                - Client-side service discovery often involves load balancing to distribute the workload across multiple
+                                                                  service instances. The client application can implement a load- balancing strategy to select a specific 
+                                                                  instance based on factors like round-robin, weighted distribution, or latency.
+                                        NOTE:- The major advantage of client-side service discovery is load balancing can be implemented using various algorithms, such
+                                               as round-robin, weighted round-robin, least connections, or even custom algorithms. A drawback is that client service 
+                                               discovery assigns more responsibility to developers. Also, it results in one more service to deploy and maintain (the
+                                               service registry). Server-side discovery solutions solve these issues. We are going to discuss the same when we are 
+                                               talking about Kubernetes
+
+                       - How Client-side service discovery works ?
+                                  - look madan reddy notes to understand diagram.
+                       - How loadbalancing works in Client-side service discovery ?
+                                  - look madan reddy notes to understand diagram.
+                       - Spring Cloud support for Client-side service discovery ?
+                                  - Spring Cloud project makes Service Discovery & Registration setup easy to do with the help of the below components,
+                                               • Spring Cloud Netflix's Eureka service which will act as a service discovery agent.
+                                               • Spring Cloud Load Balancer library for client-side load balancing
+                                               • Netflix Feign client to look up for a service b/w microservices
+                                Note:- Though in this course we use Eureka since it is mostly used but they are other service registries such as etcd,Consul, and 
+                                       Apache Zookeeper which are also good. Though Netflix Ribbon client-side is also good and stable product, we are going to use 
+                                       Spring Cloud Load Balancer for client-side load balancing. This is because Ribbon has entered a maintenance mode and unfortunately,
+                                       it will not developed anymore
+                                  - Advantages of Service Discovery approach includes,
+                                               • No limitations on availability
+                                               • Direct communication b/w Services Discovery agents
+                                               • Dynamically managed IPs, configurations & Load balanced
+                                               • Fault-tolerant & Resilient in nature
+                       - Steps to build Eureka Server :
+                                 1. Set up a new Spring Boot project: 
+                                         - Include the spring-cloud-starter-netfiix-eureka-server,spring-cloud-starter-config,spring-boot-starter-actuator maven dependency.
+                                 2. Configure the properties: 
+                                         - In the application properties or YAML file, add the following configurations,
+                                                                             server:
+                                                                               port: 8070
+
+                                                                             eureka:
+                                                                               instance:
+                                                                                 hostname: localhost
+                                                                               client:
+                                                                                 fetchRegistry: false
+                                                                                 registerWithEureka: false
+                                                                                 serviceUrl:
+                                                                                   defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+                                 3. Add the Eureka %rver annotation: 
+                                         - In the main class Of your project, annotate it with @EnableEurekaServer.This annotation configures the application to act 
+                                           as a Eureka Server.
+                                 4. Build and run the Eureka Server: 
+                                         - Build your project and run it as a Spring Boot application. Open a web browser and navigate to http://localhost:8070.You 
+                                           should see the Eureka Server dashboard, which displays information registered service instances.
+                       - Steps to register a microservice as a Eureka Client :
+                                 1. Set up a new Spring Boot project: 
+                                         -  Include the spring-cloud-starter-netfiix-eureka-client maven dependency.
+                                 2. Configure the properties: 
+                                         -  In the application properties or YAML file, add the following configurations,
+                                                                                            eureka:
+                                                                                              instance:
+                                                                                                preferIpAddress: true
+                                                                                              client:
+                                                                                                fetchRegistry: true
+                                                                                                registerWithEureka: true
+                                                                                                serviceUrl:
+                                                                                                  defaultZone: http://localhost:8070/eureka/
+                                 3. Build and run the application: 
+                                         -  Build your project and run it as a Spring Boot application. Open a web browser and navigate to http://localhost:8070.You 
+                                            should see the microservice registered itself as an application and the same can confirmed inside the Eureka Server 
+                                            dashboard.
+
+                            NOTE:- whatever microservice instance registered with eureka by hitting this url can see along with various information:
+                                   http://localhost:8070/eureka/apps same url can be hit by postman for json format but need to add one header : 
+                                   Accept : application/json
+    
+
+
+
+
                 
 
 

@@ -1588,30 +1588,96 @@ SECTION 08 :
                             NOTE:- whatever microservice instance registered with eureka by hitting this url can see along with various information:
                                    http://localhost:8070/eureka/apps same url can be hit by postman for json format but need to add one header : 
                                    Accept : application/json
-    
+                       - How can we enable and trigger the graceful shutdown of a Spring Boot microservice:
+                                               - yml Configure:
+                                                                management:
+                                                                       endpoint:
+                                                                            shutdown:
+                                                                               access: unrestricted
+                                               - trigger shutdown using:
+                                                             POST http://localhost:8080/actuator/shutdown
 
-
-
-
-                
-
-
-                
-
-        
-                Q8. Explain client side service discovery and client side load balancing ?
-                Q9. How client side service discovery works ?
-                Q10. How loadbalancing works in client side service discovery ?
-                Q11. How does spring cloud support client side service discovery in microservices?
-                Q12. What are the steps to build Eureka Server ?
-                Q13. What are the steps to register a microservice as a Eureka Client ?
-                Q14. How to shutdown running application gracefully so that it shutdown and also de-register from eureka ?   for this call actuator url like, http://localhost:{port}/actuator/shutdown 
-                Q15. How does Eureka Server know whether a service instance is alive or down? Netflix Eureka automatically heartbeat receive karta rehta hai (default every 30 sec); agar 90 sec tak heartbeat na aaye to service ko DOWN maan leta hai.jabki individual microservices automatically heartbeat bhejte rehte hain to Netflix Eureka.
                 Q16. What is Feign clients ?
-                Q17. What is Eureka self-preservation mode ?
-                Q18. How does eureka self-preservation mode avoid network traps ?
+                             - Feign Client is a declarative HTTP client used to communicate with other microservices without writing the HTTP communication code manually.    
+                             - NOTE:- Feign ko Eureka/Service Discovery ke saath configure kiya hai ,Feign cards naam ki service ko Service Discovery (Eureka) se locate 
+                                      karega  or information lega.
+                            
+                        - NOTE:- jaise accounts service , cards or loans ko call kr rha hai to loadbalancing automatically hoga we don't need to worry.
 
-                                             • ROUTING & TRACING :
+                Q17. What is Eureka self-preservation mode ?
+                             - In a distributed system using Eureka, each service instance periodically sends a heartbeat signal to the Eureka server to indicate that 
+                               it is still alive and functioning. If the Eureka server does not receive a heartbeat from a service instance within a certain timeframe,
+                               it assumes that the instance has become unresponsive or has crashed. In normal scenarios, this behavior helps the Eureka server maintain
+                               an up-to-date view Of the registered service instances.
+                             - However, in certain situations, network glitches or temporary system delays may cause the Eureka server to miss a few heartbeats, leading
+                               to false expiration of service instances. This can result in unnecessary evictions of healthy service instances from the registry, 
+                               causing instability and disruption in the system.
+                             - TO mitigate this issue, Eureka enters into Self-Preservation mode. When Self-Preservation mode is active, the existing registry entries 
+                               will not be removed even if it stops receiving heartbeats from some of the service instances. This prevents the Eureka server from 
+                               evicting all the instances due to temporary network glitches or delays.
+                             - In Self-Preservation mode, the Eureka server continues to serve the registered instances to client applications, even if it suspects that
+                               some instances are no longer available. This helps maintain the stability and availability of the service registry, ensuring that clients
+                               can still discover and interact with the available instances. 
+                             - Self-preservation mode never expires, until and unless the down microservices are brought back or the network glitch is resolved. This is
+                               because eureka will not expire the instances till it is above the threshold limit.
+
+                        - NOTE:- Eureka Server will not panic when it is not receiving heartbeats from majority of the instances, instead it will be calm and enters 
+                                 into Self-preservation mode. This feature is a savior where the networks glitches are common and help us to handle false-positive 
+                                 alarms.
+                             - look mandan reddy notes for diagram visual.
+                             - Configurations which will directly or indirectly impact self-preservation behavior of eureka :
+                                      - eureka.instance.lease-renewal-interval-in-seconds = 30
+                                           Indicates the frequency the client sends to server to indicate that it is still alive
+                                      - eureka.instance. lease-expiration-duration-in-seconds = 90
+                                           Indicates the duration the server waits since it received the last heartbeat before it can evict an instance
+                                      - eureka.server.eviction-interval-timer-in-ms = 60 * 1000
+                                           A scheduler(EvictionTask) is run at this frequency which will evict instances from the registry if the lease of the instances
+                                           are expired as configured by lease-expiration-duration-in-seconds. It will also check whether the system has reached
+                                           self-preservation mode (by comparing actual and expected heartbeats) before evicting.
+                                      - eureka.server.renewal-percent-threshold = O.85
+                                           This value is used to calculate the expected % of heartbeats per minute eureka is expecting.
+                                      - eureka.server.renewal-threshold-update-interval-ms = 15 * 60 * 1000
+                                           A scheduler is run at this frequency which calculates the expected heartbeats minute
+                                      - eureka.server.enable-self-preservation = true
+                                           By default self-preservation mode is enabled but if you need to disable it you can change it to 'false'
+                                 
+
+
+
+
+SECTION 09 :
+        Gateway,Routing & Cross Cutting concerns in Microservices
+-------------------------------------------------------------------
+
+                                                         • ROUTING & TRACING  :    
+
+
+          
+
+                                             
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                              • LOAD BALANCING : 
                                              • SPRING CLOUD SECURITY :
                                              • DISTRIBUTED TRACING & MESSAGING
@@ -1620,11 +1686,6 @@ SECTION 08 :
                                              • 
 
 
-
-
-SECTION 09 :
-        Gateway,Routing & Cross Cutting concerns in Microservices
------------------------------------------------------------------
                 Q1. What is an API Gateway/Edge server and how does it help in solving challenges like maintaining a single entry point, handling cross cutting concerns and implementing dynamic routing in Microservices architecuter ?
                 Q2. What are the few important tasks that API Gateway does ?
                 Q3. What is spring cloud gateway ?

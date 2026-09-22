@@ -1649,12 +1649,225 @@ SECTION 09 :
         Gateway,Routing & Cross Cutting concerns in Microservices
 -------------------------------------------------------------------
 
-                                                         • ROUTING & TRACING  :    
+                                                         • ROUTING & TRACING  :   
+
+
+                  Q1. What are the challenges while dealing external communication in microservices?
+                          CHALLENGE-6 : 
+                                - HOW DO WE MAINTAIN A SINGLE ENTRYPOINT INTO MICROSERVICES NETWORK ?:
+                                       How do we build a single gatekeeper for all the inbound traffic to our microservices. This way the client doesn't need to keep 
+                                       track of the different services involved in a transaction, simplifying the client's logic?
+                                - HOW DO WE HANDLE CROSS CUTTING CONCERNS?:
+                                       In a distributed microservices architecture, how do we make sure to have a consistently enforced cross cutting concerns like 
+                                       logging, auditing, tracing and security across multiple microservices ?
+                                - HOW DO WE ROUTE BASED ON CUSTOM REQUIREMENTS ?:
+                                       How to provide dynamic routing capabilities which allows to define routing rules based on various criteria such as HTTP headers,
+                                       request parameters etc. inside microservices network ?
+                         - These challenges in microservices can be solved using , 
+                                                                             Edge server / API Gateway
+                       - Why we need a Edge Server or API Gateway inside microservices ?
+                                    In a scenario where multiple clients directly connect with various services, several challenges arise. For instance, clients must be
+                                    aware of the URLs of all the services, and enforcing common requirements such as security, auditing, logging, and routing becomes a
+                                    repetitive task across all services.To address these challenges, it becomes necessary to establish a single gateway as the entry 
+                                    point to the microservices network.
+                       - Why can't we create a common external module/JAR and add it as a dependency to all microservices?
+                                    We can create a common library/JAR for reusable functionality like security, logging, auditing, etc. However, the library code still
+                                    runs inside each microservice. also 
+                                           Tight coupling between microservices and the common library.
+                                           Every microservice needs to include and maintain the dependency.
+                       - Few important tasks that API Gateway does :
+                                      
+                                                CLIENTS
+                                      .-----------------------.
+                                      |                       |
+                                      |   Web  Mobile   APIs  |
+                                      '-----------------------'
+                                                |
+                                                | (1)
+                                                v
+     .---------------------------------------------------------------------------------------------------------------------------------------.
+     |                                                   API GATEWAY                                                                         |
+     |                                                                                                                                       |
+     |   .----------------.     .---------------.     .----------.     .-------.             .--------------.         .----------------.     |
+     |   | Request        |---->| Include &     |---->| AuthN    |---->| Rate  |             | Exception    |         | Circuit        |     |
+     |   | Validation     | (2) | Exclude List  | (3) | & AuthZ  | (4) | Limit |             | Handling     |         | Breaker        |     |
+     |   '----------------'     '---------------'     '----------'     '-------'             '--------------'         '----------------'     |
+     |                                                                    |                                                                  |
+     |                                                                    | (5)                                                              |
+     |                                                                    v                                                                  |
+     |  .------------.     .-----------.       .-------------.     .-------------.            .----------------.        .------------.       |
+     |  | Protocol   |<----| Modify    |<---- | Service      |<----| Dynamic      |           | Logging &      |        | Cache      |       | 
+     |  | Conversion | (8) | Req/Res   | (7)  | Discovery    | (6) | Routing      |           | Monitoring     |        '------------'       |
+     |  '------------'     '-----------'       '-------------'     '--------------'           '----------------'                |            |
+     '-------------------------------------------------------------------------------------------------|------------------------|------------' 
+            |                                                                                          |                        |
+            | (9)                                                                                      v                        v
+            v                                                                                .-----------------.         .-----------.
+        MICROSERVICES                                                                        | Observability   |         |  Redis    |
+    .-----------------------------.                                                          | Tools / Grafana |         '-----------'
+    | Accounts / Loans / Cards MS |                                                          '-----------------'
+    '-----------------------------'
+
+                       - What is Spring Cloud Gateway ?
+                                - Defination:
+                                          Spring Cloud Gateway is an API Gateway built on top of spring webflux. it act as a single entry point for all incoming
+                                          requests,intercepts,analyzes,and modifies the requests,and then routes then to the appropriate backend services(microservices)
+                                          based on different rules and context.
+                                - Key Points:
+                                         - sits between the client and microservices(act as gateway).
+                                         - intercept and analyzes every incoming request.
+                                         - can modify requests and responses(eg. add headers,change body etc).
+                                         - Routes requests based on rules and context(eg. API Version,path,headers).
+                                         - support features like,sticky sessions, load balancing,security,rate limiting, etc.
+                             NOTE:- Spring Cloud Gateway is the preferred API gateway compared to zuul. Because Spring Cloud Gateway built on Spring Reactor & Spring 
+                                    WebFlux, provides circuit breaker integration, service discovery with Eureka, non-blocking in nature, has a superior performance 
+                                    compared to that Of zuul.
+
+                       - Spring Cloud Gateway Internal Architecture ?
+
+                                                                                                                                MICROSERVICES
+                                          .---------------------------------------------------------------------.          .---------------------.
+                                          |                                                                     |          |                     |
+                                          |   .-----------------------------.                                   |          |     .---------.     |
+                                          |   |         Predicates          | Request     .----------------.    |  Request |     | Accounts|     |         
+                                          |   | (Check if request fulfills  |------------>|   Pre Filters  |-------------->|     '---------'     |
+                                          |   |    given conditions)        |             |   |  |  |  |   |    |          |                     |
+                                          |   '-----------------------------'             '----------------'    |          |     .---------.     |
+                                          |                  ↑                                                  |          |     |  Loans  |     |
+                                          |               Request                                               |          |     '---------'     |
+                                          |                  |                                                  |          |                     |
+                      .---------.         |                  |                                                  |          |                     |
+                      | CLIENTS | Request |   .-----------------------------. Response  .----------------.      | Response |     .---------.     |
+                      |         |-------->|   | Gateway Handler Mapping     |<----------|  Post Filters  |<-----|----------|     |  Cards  |     |        
+                      |  📱      |<--------|   |       using Routing Configs |           |   |  |  |  |   |      |          |     '---------'     |
+                      |  WEB    | Response|   '-----------------------------'           '----------------'      |          |                     |
+                      | MOBILE  |         |                                                                     |          |                     |
+                      '---------'         '---------------------------------------------------------------------'          '---------------------'
+                 
+                    When the client makes a request to the Spring Cloud Gateway, the Gateway Handler Mapping first checks if the request matches a route. This matching
+                    is done using the predicates. If it matches the predicate then the request is sent to the pre filters followed by actual microservices. The response 
+                    will travel through post filters.
+
+                       - Steps to create Spring Cloud Gateway :
+                                  1. Set up a new Spring Boot project: 
+                                              Start by creating a new Spring Boot project  Include the spring-cloud-starter-gateway, spring-cloud-starter-config & 
+                                              spring-cloud-starter-netflix-eureka-client maven dependencies.
+                                  2. Configure the Properties:
+                                             Make routing configurations using RouteLocatorBuilder :
+                                                                              spring:
+                                                                                cloud:
+                                                                                  gateway:
+                                                                                    server:
+                                                                                      webflux:
+                                                                                        discovery:
+                                                                                          locator:
+                                                                                            enabled: false
+                                                                                            lowerCaseServiceId: true
+                                  3. Configure the routing config:
+	                                       @Bean
+		                               public RouteLocator eazyBankRouteConfig(RouteLocatorBuilder routeLocatorBuilder){
+	                                            return routeLocatorBuilder.routes()
+	                                                   .route(p-> p
+						                   .path("/eazybank/accounts/**")
+						                   .filters(f->f.rewritePath("/eazybank/accounts/(?<segment>.*)","/${segment}"))
+						                   .uri("lb://ACCOUNTS"))
+				                          .route(p-> p
+						                   .path("/eazybank/loans/**")
+						                   .filters(f->f.rewritePath("/eazybank/loans/(?<segment>.*)","/${segment}"))
+						                   .uri("lb://LOANS"))
+				                          .route(p-> p
+						                   .path("/eazybank/cards/**")
+						                   .filters(f->f.rewritePath("/eazybank/cards/(?<segment>.*)","/${segment}"))
+						                   .uri("lb://CARDS")).build();
+	                                          }
+                                  4. Build and run the application: 
+                                               Build your project and run it as a Spring Boot application. Invokes the APIs using which is the gateway path.
+
+                       - Why do we need custom routing?
+                              - Discovery Locator se Gateway automatically route bana sakta hai eg :
+                                                                                              /accounts/**  → ACCOUNTS
+                                                                                              /loans/**     → LOANS
+                                                                                              /cards/**     → CARDS
+                              - to see default route access: http://localhost:8072/actuator/gateway/routes
+                              - But real projects mein humein exact control chahiye hota hai ki:
+                                                - kaunsa URL kis service ko jaaye
+                                                - URL ko rewrite/transform karna hai ya nahi
+                                                - authentication/authorization kis route par lage
+                                                - specific headers add/remove karne hain
+                                                - retry/circuit breaker lagana hai
+                                                - rate limiting lagani hai
+                                                - public/private endpoints alag karne hain
+                                                - external URL ko internal service URL se hide karna hai
+                       - How many ways to create custom routes?
+                                       - Spring Cloud Gateway mein commonly 3 major ways :
+                                                                                            Custom Routing
+                                                                                                  |
+                                                                                        +-----------+-----------+
+                                                                                        |           |           |
+                                                                                        v           v           v
+                                                                                   Discovery   application.yml  Java       
+                                                                                    Locator                     Routes       
+                                               - Discovery Locator:
+                                                                   spring:
+                                                                     cloud:
+                                                                       gateway:
+                                                                         server:
+                                                                           webflux:
+                                                                             discovery:
+                                                                               locator:
+                                                                                 enabled: true
+                                               - Configuration-based routing like, application.yml / application.properties :
+                                                                   spring:
+                                                                     cloud:
+                                                                       gateway:
+                                                                         server:
+                                                                           webflux:
+                                                                             routes:
+                                                                               - id: accounts
+                                                                                 uri: lb://ACCOUNTS
+                                                                                 predicates:
+                                                                                   - Path=/accounts/**
+                                               - Java-based routing using RouteLocatorBuilder :
+                                                                   @Bean
+                                                                   public RouteLocator customRoutes(RouteLocatorBuilder builder) {
+
+                                                                       return builder.routes()
+                                                                               .route("accounts", r -> r
+                                                                                       .path("/accounts/**")
+                                                                                       .uri("lb://ACCOUNTS"))
+                                                                               .route("loans", r -> r
+                                                                                       .path("/loans/**")
+                                                                                       .uri("lb://LOANS"))
+                                                                               .build();
+                                                                   }
+
+                       - if we can't find filter as per our requirement for routing:
+                                   scenario: i want to take business scenario where as soon as my gateway server receive external traffic/request,it has to generate
+                                             co-relationId and same co-realtionId i want to send all the further microservices that my request going to travel eg.
+                                             gateway to accounts , accounts to loans and cards and using same co-realtionId i want to add some logger statment while 
+                                             sending back to the client i want to add same co-relationId for future use if some issue coming.
+                              NOTE: Servlet is a Java-based API/class model used to handle HTTP requests and responses, while Spring WebFlux is a reactive, non-blocking
+                                    web framework designed for handling asynchronous and high-concurrency workloads. 
+                       - 
+                       - 
+                       -  
+
+
+
+
+ 
 
 
           
 
                                              
+
+                         
+
+
+
+
+
 
 
 

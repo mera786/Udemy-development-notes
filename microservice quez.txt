@@ -1846,11 +1846,103 @@ SECTION 09 :
                                              co-relationId and same co-realtionId i want to send all the further microservices that my request going to travel eg.
                                              gateway to accounts , accounts to loans and cards and using same co-realtionId i want to add some logger statment while 
                                              sending back to the client i want to add same co-relationId for future use if some issue coming.
+                                           so this scinario can be solved by implementing GlobalFilter and writing logic.
                               NOTE: Servlet is a Java-based API/class model used to handle HTTP requests and responses, while Spring WebFlux is a reactive, non-blocking
                                     web framework designed for handling asynchronous and high-concurrency workloads. 
-                       - 
-                       - 
-                       -  
+                      
+
+                    =====================
+                    API GATEWAY PATTERN
+                    =====================
+
+                        Definition:
+                             API Gateway is an architectural pattern that provides a single entry point for clients to access multiple microservices.
+                                                             Client
+                                                                |
+                                                                v
+                                                       +------------------+
+                                                       |   API GATEWAY    |
+                                                       +------------------+
+                                                          |      |      |
+                                                          v      v      v
+                                                       Accounts Loans  Cards
+
+
+                        Common Patterns / Approaches Used with API Gateway
+                        ---------------------------------------------------
+
+                         1. Gateway Routing Pattern
+                                    - Routes client requests to the appropriate microservice.
+                                    - Example:
+                                        /accounts/**  -> Accounts Service
+                                        /loans/**     -> Loans Service
+                                        /cards/**     -> Cards Service
+                                                           .route("accounts", r -> r
+                                                                  .path("/accounts/**")
+                                                                  .uri("lb://ACCOUNTS"))
+
+                         2. Gateway Offloading Pattern
+                                    - Moves common responsibilities from microservices to the API Gateway.
+                                    - Examples:
+                                                           Client
+                                                             |
+                                                             v
+                                                       +-------------+
+                                                       | API Gateway |
+                                                       +-------------+
+                                                         |    |    |
+                                                         |    |    +── SSL/TLS
+                                                         |    +─────── Authentication
+                                                         +──────────── Rate Limiting
+                                                             |
+                                                             v
+                                                         Microservices
+
+                         3. Gateway Aggregation / Composition Pattern
+                                    - Gateway calls multiple microservices and combines their responses into a single response.
+                                                                     Client
+                                                                       |
+                                                                       v
+                                                                 +---------------+
+                                                                 | API Gateway   |
+                                                                 +---------------+
+                                                                  /      |      \
+                                                                 v       v       v
+                                                             Accounts   Loans   Cards
+                                                                  \       |      /
+                                                                   \      |     /
+                                                                    +-----+----+
+                                                                          |
+                                                                   Combined Response
+                                                                          |
+                                                                          v
+                                                                        Client
+
+                         4. Backend For Frontend (BFF) Pattern
+                                    - Creates a separate backend/API layer for each type of client.
+                                                                 Clients
+                                                                     |
+                                                                     v 
+                                                           ------------------------
+                                                          /           |            \
+                                                         v            v             v
+                                                        Web         Mobile        Tablet
+                                                         |           |                |
+                                                         v           v                v
+                                                 +-------------+ +--------------+  +----------------+
+                                                 | API GATEWAY | | API GATEWAY  |  | API GATEWAY    |
+                                                 |    Web      | |    Mobile    |  |     Tablet     |
+                                                 +-------------+ +--------------+  +----------------+
+                                                      |                 |                  |
+                                                 +----------------------+---------------------------+
+                                                                        |
+                                                                    Microservices
+                           Key Point:
+                          -----------
+                              API Gateway = Main Architectural Pattern
+                              Routing / Offloading / Aggregation / BFF
+                                          = Related patterns/approaches used with API Gateway architecture.
+
 
 
 

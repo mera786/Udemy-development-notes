@@ -1944,64 +1944,105 @@ SECTION 09 :
                                           = Related patterns/approaches used with API Gateway architecture.
 
 
+SECTION 10 :
+        MAKING MICROSERVICES RESILIENT(Resilience: Ability to recover from failures and continue working.)
+-----------------------------------------------------------------------------------------------------------
+
+                Q1. What are the challenges of building resilient microservices? 
+                          CHALLENGE-7 : 
+                                - HOW DO WE AVOID CASCADING(One failure causing a chain of failures.) FAILURES? :
+                                       One failed or slow service should not have a ripple effect on the Other microservices. Like in the scenarios Of multiple 
+                                       microservices are communicating, we need to make sure that the entire chain of microservices does not fail with the failure Of a
+                                       single microservlce ?
+                                - HOW DO WE HANDLE FAILURES GRACEFULLY WITH FALLBACKS ? :
+                                       In a chain of multiple microservices, how do we build a fallback mechanism if one of the microservice is not working. Like 
+                                       returning a default value or return values from cache or call another service/DB to fetch the results etc. ?
+                                - HOW TO MAKE OUR SERVICES SELF-HEALING CAPABLE ?:
+                                       In the cases Of slow performing services, how do we configure timeouts, retries and give time for a failed services to recover 
+                                       itself.?
+                         - These challenges in microservices can be solved using below concepts or solutions,
+                                       There exist various patterns for building resilient applications. In the Java ecosystem, Hystrix, a library developed by Netflix,
+                                       was widely used for implementing such patterns. However, Hystrix entered maintenance mode in 2018 and is no longer being actively
+                                       developed. To address this, Resilience4J has gained significant popularity, stepping in to fill the gap left by Hystrix. 
+                                       Resilience4J provides a comprehensive set Of features for building resilient applications and has become a go-to choice for Java
+                                       developers.
+                         - RESILIENCY USING RESILIENCE4J :
+                                       - Resilience4j is a lightweight fault tolerance library designed for functional programming. 
+                                       - It offers the following patterns for increasing fault tolerance due to network problems or failure of any of the multiple 
+                                         services:
+                                               - Circuit breaker :
+                                                       Used to stop making requests when a service invoked is failing
+                                               - Fallback :
+                                                       Alternative paths to failing requests
+                                               - Retry :
+                                                       Used to make retries when a service has temporarily failed
+                                               - Rate limit :
+                                                       Limits the number of calls that a service receives in a time
+                                               - Bulkhead :
+                                                       Limits the number of outgoing concurrent requests to a service to avoid overloading
+
+                         - CIRCUIT BREAKER PATTERN :
+                               - The Circuit Breaker pattern which inspired from electrical circuit breaker will monitor the remote calls. If the calls take too long, 
+                                 the circuit breaker will intercede and kill the call. Also, the circuit breaker will monitor all calls to a remote resource, and if 
+                                 enough calls fail, the circuit break implementation will pop, failing fast and preventing future calls to the failing remote resource.
+                               - The Circuit Breaker pattern also enables an application to detect whether the fault has been resolved. If the problem appears to have
+                                 been fixed, the application can try to invoke the operation.
+                               - The advantages with circuit breaker pattern are,
+                                                                              Fail fast
+                                                                              Fail gracefully
+                                                                              Recover seamlessly
+                               - In Resilience4j, the circuit breaker is implemented via three states :
+
+                  CLOSED - Initially the circuit breaker starts With closed         OPEN — If Circuit breaker sees a threshold requests are
+                           status and accepts client requests                              failing, then it Will OPEN the circuit which Will make requests fail fast
+                 +-------------+                                      +-------------+
+                 |             |   1. Failure rate above threshold    |             |
+                 |   CLOSED    |------------------------------------> |    OPEN     |
+                 |             |                                      |             |
+                 +-------------+                                      +-------------+
+                             ↑                                           /↑
+                              \                                         //
+                               \                                       //                      
+                                \                        2. after     //                                                      
+                                 \                          wait     //
+                                  \                        duration // Failure rate above 
+                   3. Failure rate \                               //  threshold.
+                      below a       \                             //
+                      threshold      \                           //
+                                      \                         //
+                                       \                       //
+                                        \                     //
+                                         \                   ↓/
+                                        +---------------------+
+                                        |                     |
+                                        |     HALF-OPEN       |
+                                        |                     |
+                                        +---------------------+
+
+                                    HALF_OPEN - Periodically Circuit breaker checks if the issue is
+                                                resolved by allowing few requests. Based on the results 
+                                                it will either go to CLOSED or OPEN
+
+
+
+
+
+
+
+
 
 
 
  
-
-
-          
-
-                                             
-
-                         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                                              • LOAD BALANCING : 
                                              • SPRING CLOUD SECURITY :
                                              • DISTRIBUTED TRACING & MESSAGING
                                              • 
                                              • 
-                                             • 
+                                             •  
 
 
-                Q1. What is an API Gateway/Edge server and how does it help in solving challenges like maintaining a single entry point, handling cross cutting concerns and implementing dynamic routing in Microservices architecuter ?
-                Q2. What are the few important tasks that API Gateway does ?
-                Q3. What is spring cloud gateway ?
-                Q4. Explain spring cloud gateway internal architecture ?
-                Q5. What are the steps to create spring cloud gateway project ?
-                Q6. Why do we enable spring.cloud.gateway.server.webflux.discovery.locator.enabled=true in Spring Cloud Gateway?  It enables automatic route creation in Spring Cloud Gateway using services registered in Netflix Eureka.
-                Q7. What is the use of lowerCaseServiceId=true in Spring Cloud Gateway?  It converts service IDs to lowercase while creating routes, so URLs become cleaner and consistent like /accounts/** instead of /ACCOUNTS/**.
-                Q8. What are the different variations of API Gateway pattern ? 
-SECTION 10 :
-        MAKING MICROSERVICES RESILIENT
---------------------------------------
                 Q1. What is the meaning of Resilience ?  Difficult situation, failure, pressure, ya problem ke baad bhi quickly recover karne ki ability.
                 Q1. What are the challenges comes for Resilience in microservices and what library give the solutions?
                 Q1. What are the pattern resilience4j provides ?

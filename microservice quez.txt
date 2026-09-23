@@ -2024,10 +2024,85 @@ SECTION 10 :
                                                 it will either go to CLOSED or OPEN
 
 
+                         - circuit breaker API gateway and microservices it self implement kiya ja skta hai.
 
+                                 - steps to build a circuit breaker pattern using Spring Cloud Gateway filter,
 
+                                     1 . Add maven dependency: 
+                                                   Add spring-cloud-starter-circuitbreaker-reactor-resilience4j maven dependency inside pom.xml
+                                     2 . Add circuit breaker filter: 
+                                                   Inside the method where we are creating a bean Of RouteLocator, add a filter Of circuit breaker like highlighted 
+                                                   below and create a REST API handling the fallback uri /contactsupport
+                            	@Bean
+	                        public RouteLocator eazyBankRouteConfig(RouteLocatorBuilder routeLocatorBuilder){
+		                     return routeLocatorBuilder.routes()
+				         .route(p-> p
+						.path("/eazybank/accounts/**")
+						.filters(f->f
+								.rewritePath("/eazybank/accounts/(?<segment>.*)","/${segment}")
+								.addResponseHeader("X-RESPONSE-TIME", LocalDateTime.now().toString())
+								.circuitBreaker(config -> config.setName("accountsCircuitBreaker"))
+                                                                .setFallbackUri("forward:/contactsupport"))
+						.uri("lb://ACCOUNTS"))
 
+                                     3 . Add properties: 
+                                              Add the below properties inside the application.yml file,
+                                                                           resilience4j.circuitbreaker:
+                                                                               configs:
+                                                                                  default:
+                                                                                      slidingWindowSize: 10  # Last 10 calls ko check karke failure rate calculate karega
+                                                                                      permittedNumberOfCallsInHalfOpenState: 2  # Half-Open state mein testing ke liye maximum 2 calls allow karega
+                                                                                      failureRateThreshold: 50  # Agar 50% ya usse zyada calls fail hui, Circuit Open ho jayega
+                                                                                      waitDurationInOpenState: 10000   # Circuit Open hone ke baad 10 seconds wait karega before going to Half-Open
 
+                                            NOTE: 
+                                                 to see overall :-         http://localhost:8072/actuator/circuitbreakers
+                                                 to see on each call what's happening:-   http://localhost:8072/actuator/circuitbreakerevents
+                                              however jb hum actautor ka url access krenge to ye dono url mil jayega:   http://localhost:8072/actuator  
+                                 - steps to build a circuit breaker pattern using normal Spring service,
+                                     1 . Add maven dependency: 
+                                                   Add spring-cloud-starter-circuitbreaker-resilience4j maven dependency inside pom.xml
+                                     2 . Add circuit breaker related changes in Feign Client interfaces like shown below:
+                                                            @FeignClient(name="cards", fallback = CardsFallback.class)
+                                                            public interface CardsFeignClient {
+
+                                                                @GetMapping(value = "/api/fetch",consumes = "application/json")
+                                                                public ResponseEntity<CardsDto> fetchCardDetails( @RequestHeader("eazybank-correlation-id") String correlationId,
+                                                                                                                  @RequestParam String mobileNumber);
+                                                            }
+ 
+                                                            @Component
+                                                            public class CardsFallback implements CardsFeignClient{
+
+                                                                @Override
+                                                                public ResponseEntity<CardsDto> fetchCardDetails(String correlationId, String mobileNumber) {
+                                                                    return null;
+                                                                }
+
+                                                            }
+                                     3. Add properties: 
+                                                Add the below properties inside the application.yml file,
+                                                                                    spring:
+                                                                                      cloud:
+                                                                                        openfeign:
+                                                                                          circuitbreaker:
+                                                                                            enabled: true
+                                                                                    resilience4j.circuitbreaker:
+                                                                                      configs:
+                                                                                        default:
+                                                                                          slidingWindowSize: 10
+                                                                                          permittedNumberOfCallsInHalfOpenState: 2
+                                                                                          failureRateThreshold: 50
+                                                                                          waitDurationInOpenState: 10000
+                                  NOTE:- HTTP timeout configurations:
+                                                               spring:
+                                                                 cloud:
+                                                                   gateway:
+                                                                     server:
+                                                                       webflux:
+                                                                         httpclient:
+                                                                           connect-timeout: 1000
+                                                                           response-timeout: 2s
 
 
 

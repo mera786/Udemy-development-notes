@@ -2196,7 +2196,79 @@ SECTION 10 :
                                           
 
                          - RATE LIMITTER PATTERN :
+                                  - The Rate Limiter pattern in microservices is a design pattern that helps control and limit the rate of incoming requests to a service
+                                    or API. It is used to protect system resources, and ensure fair usage of the service.
+                                  - In a microservices architecture, multiple services may depend on each other and make requests to communicate. However, unrestricted
+                                    and uncontrolled requests can lead to performance degradation, resource exhaustion, and potential denial-of-service (DOS) attacks. 
+                                    The Rate Limiter pattern provides a mechanism to enforce limits on the rate of incoming requests.
+                                  - Implementing the Rate Limiter pattern helps protect rnicroservices from being overwhelmed by excessive or malicious requests. It 
+                                    ensures the stability, performance, and availability of the system while providing controlled access to resources. By enforcing 
+                                    rate limits, the Rate Limiter pattern helps maintain a fair and reliable environment for both the service provider and its consumers.
+                                  - When a user surpasses the permitted number of requests within a designated time frame, any additional requests are declined with an
+                                    HTTP 429 - Too Many Requests status. The specific limit is enforced based on a chosen strategy, such as limiting requests per 
+                                    session, IP address, user, or tenant.The primary objective is to maintain system availability for all users, especially during 
+                                    challenging circumstances. This exemplifies the essence of resilience. Additionally, the Rate Limiter pattern proves beneficial for 
+                                    providing services to users based on their subscription tiers. For instance, distinct rate limits can be defined for basic, premium,
+                                    and enterprise users.
+                                  - steps to build a rate limitter pattern using Spring Cloud Gateway filter,
+                                          1. Add maven dependency: 
+                                                    - Add spring-boot-starter-data-redis-reactive maven dependency inside pom.xml :
+		                                          <dependency>
+			                                         <groupId>org.springframework.boot</groupId>
+			                                         <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+		                                          </dependency>
+                                                    - and make sure a redis container started.Mention redis connection details inside the application.yml file
+                                                                               spring:
+                                                                                 cloud:
+                                                                                   data:
+                                                                                     redis:
+                                                                                        connect-timeout: 2s
+                                                                                        host: localhost
+                                                                                        port: 6379
+                                                                                        timeout: 1s
 
+                                          2. Add rate limiter filter: 
+                                                    - Inside the method where we are creating a bean Of RouteLocator, add a filter Of rate limiter like highlighted 
+                                                      below and creating supporting of RedisRateLimiter and KeyResolver 
+	                                       @Bean
+	                                       public RouteLocator eazyBankRouteConfig(RouteLocatorBuilder routeLocatorBuilder){
+		                                return routeLocatorBuilder.routes()
+				                     .route(p-> p
+						            .path("/eazybank/cards/**")
+						            .filters(f->f
+								.rewritePath("/eazybank/cards/(?<segment>.*)","/${segment}")
+								.addResponseHeader("X-RESPONSE-TIME", LocalDateTime.now().toString())
+								.requestRateLimiter(config -> config
+										                     .setRateLimiter(redisRateLimiter())
+										                     .setKeyResolver(userKeyResolver())))
+						         .uri("lb://CARDS")).build();
+
+	                                         @Bean
+	                                         public RedisRateLimiter redisRateLimiter() {
+			                                      return new RedisRateLimiter(1, 1, 1);
+		                                   }
+
+	                                         @Bean
+	                                         KeyResolver userKeyResolver() {
+			                                  return exchange -> Mono.justOrEmpty(exchange.getRequest().getHeaders().getFirst("user"))
+				                                            .defaultIfEmpty("anonymous");
+		                                         }
+                                        NOTE:- 
+                                              KeyResolver :
+                                                       - KeyResolver: Identifier — ye decide karta hai ki rate limit kis user/request ke basis par apply hogi.
+                                                       - Example: userId, IP address, API key etc.
+                                              What are the important properties of Redis RateLimiter :
+                                                                 | Property                           | One-line meaning                                             
+                                                                 | ---------------------------------- | -------------------------------------------------- |
+                                                                 | redis-rate-limiter.replenishRate   | Har second bucket me kitne tokens add honge.       |
+                                                                 | redis-rate-limiter.burstCapacity   | Bucket me maximum kitne tokens store ho sakte hain.|
+                                                                 | redis-rate-limiter.requestedTokens | Har request ke liye kitne tokens consume/honge.    |
+                                                  and ye buckets kaise manage hoga kaise update hoga iska value sb internal hai redis dekhta hai sirf hme configuration
+                                                  krna hota hai.na ki bucket manage.
+
+
+                                          3.
+                                          1.
 
 
 

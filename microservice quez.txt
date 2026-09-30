@@ -2266,24 +2266,48 @@ SECTION 10 :
                                                   and ye buckets kaise manage hoga kaise update hoga iska value sb internal hai redis dekhta hai sirf hme configuration
                                                   krna hota hai.na ki bucket manage.
 
-
-                                          3.
-                                          1.
-
+                                       To Test : run redis image, run configserver,eurekaserver,cards microservice then gatewayserver and provide cards url through 
+                                                 gateway server like gateway host and port in jmeter.bat file me.
 
 
+                                  -  steps to build a rate limiter pattern using normal Spring Boot service,
+                                           1. Add Rate limitter pattern annotations: 
+                                                       Choose a method and mention rate limitter pattern related annotation along with the below configs. Post that 
+                                                       create a fallback method matching the same method signature like we discussed inside the course,
+                                             @RateLimiter(name= "getJavaVersion", fallbackMethod = "getJavaVersionFallback")
+                                             @GetMapping("/java-version")
+                                             public ResponseEntity<String> getJavaVersion() {
+                                                 return ResponseEntity
+                                                         .status(HttpStatus.OK)
+                                                         .body(environment.getProperty("JAVA_HOME"));
+                                             }
+
+                                             public ResponseEntity<String> getJavaVersionFallback(Throwable throwable) {
+                                                 return ResponseEntity
+                                                         .status(HttpStatus.OK)
+                                                         .body("Java 21"+ throwable.getMessage());
+                                             }
+
+                                          2. Add properties: 
+                                                       Add the below properties inside the application.yml file,
+                                               resilience4j.ratelimiter:
+                                                 configs:
+                                                   default:
+                                                     timeoutDuration: 1000        # Request ko permit ke liye maximum 1000ms (1 second) wait karega.
+                                                     limitRefreshPeriod: 5000     # Har 5000ms (5 seconds) me request limit refresh/reset hogi.
+                                                     limitForPeriod: 1            # Har 5 seconds ke period me maximum 1 request allow hogi.
+
+
+                         - BULKHEAD PATTERN :
+                                    - read madan reddy notes. because this implentation we are skipping.
+
+                                   NOTE:- Reading documentation to implement : https://resilience4j.readme.io/docs/getting-started-3
+                                         
 
 
 
 
  
-
-                                             • LOAD BALANCING : 
-                                             • SPRING CLOUD SECURITY :
-                                             • DISTRIBUTED TRACING & MESSAGING
-                                             • 
-                                             • 
-                                             •  
  NOTE : for section 10 :
 Synchronous :
 Synchronous communication is a communication approach where Microservice 1 sends a request to Microservice 2 and waits for the response before it can continue with 

@@ -2302,7 +2302,141 @@ SECTION 10 :
                                     - read madan reddy notes. because this implentation we are skipping.
 
                                    NOTE:- Reading documentation to implement : https://resilience4j.readme.io/docs/getting-started-3
-                                         
+
+
+
+SECTION 11 :
+        Obserability and monitoring of microservices
+-----------------------------------------------------
+                          CHALLENGE-8 : 
+                                - DEBUGGING A PROBLEM IN MICROSERVICES ? :
+                                      - How do we trace transactions across multiple services, containers and try to find where exactly the problem or bug is?
+                                      - How do we combine all the logs from multiple services into a central location where they can be indexed, searched, filtered, 
+                                        and grouped to find bugs that are contributing to a problem?
+                                - MONITORING PERFORMANCE OF SERVICE CALLS? :
+                                       How can we track the path of a specific chain service call through our microservices network, and see how long it took to 
+                                       complete at each microservice?
+                                - MONITORING SERVICES METRICS & HEALTH ?
+                                      - How can we easily and efficiently monitor the metrics like CPU usage, JVM metrics, etc. for all the microservices applications 
+                                        in our network?
+                                      - How can we monitor the status and health Of all Of our microservices applications in a single place, and create alerts and 
+                                        notifications for any abnormal behavior of the services?
+                       
+                Q1. WHAT IS OBSERVABILITY ?
+                        - Observability is the ability to understand the internal state of a system by observing its outputs. 
+                        - In today's cloud-native world, observability is essential. 
+                        - The three pillars of observability are:
+                                    - Metrics: 
+                                            - Metrics tell you how your application behaves.
+                                            - Metrics are quantitative measurements of the health of a system.
+                                            - They can be used to track things like CPU usage, memory usage, and response times.
+                                    - Logs: 
+                                            - logs reveal what the application is communicating at every step. 
+                                            - Logs are a record of events that occur in a system.
+                                            - They can be used to track things like errors, exceptions, and other unexpected events.
+                                    - Traces: 
+                                            - traces show how requests move across classes.
+                                            - Traces are a record of the path that a request takes through a system. 
+                                            - They can be used to track the performance of a request and to identify bottlenecks(rukawat).
+                              NOTE:- By collecting and analyzing data from these three sources, you can gain a comprehensive(poora aur detailed) understanding of the 
+                                     internal state of your backend application. This understanding can be used to identify and troubleshoot problems, 
+                                     improve performance, and ensure the overall health of your system.
+
+                Q1. WHAT IS MONITORING ?
+                           - Monitoring in microservices involves checking the telemetry data available for the application and defining alerts for known failure states. 
+                             This process collects and analyzes data from a system to identify and troubleshoot problems, as well as track the health of individual 
+                             microservices and the overall health of the microservices network.
+                           - Monitoring in microservices is because it allows you to:
+                                   - Identify and troubleshoot problems: 
+                                               By collecting and analyzing data from your microservices, you can identify problems before they cause outages or other 
+                                               disruptions.
+                                   - Track the health of your microservices: 
+                                                Monitoring can help you to track the health of your microservices, so you can identify any microservices that are 
+                                                underperforming or that are experiencing problems
+                                   - Optimize your microservices:
+                                                By monitoring your microservices, you can identify areas where you can optimize your microservices to improve performance 
+                                                and reliability.
+                              NOTE:- Monitoring and observability can be considered as two sides of the same coin.Both rely on the same types of telemetry data to enable 
+                                     insight into software distributed systems. Those data types — metrics, traces, and logs — are often referred to as the three pillars
+                                     of observability.
+                           - Observability vs. Monitoring :
+                                                    | Feature  |              Monitoring            |              Observability                    |
+                                                    |----------|------------------------------------|-----------------------------------------------|
+                                                    | Purpose  | Identify and troubleshoot problems | Understand the internal state of a system     |
+                                                    | Data     | Metrics, traces, and logs          | Metrics, traces, logs, and other data sources |
+                                                    | Goal     | Identify problems                  | Understand how a system works                 |
+                                                    | Approach | Reactive                           | Proactive                                     |
+                              NOTE:- 
+                                 In other words, monitoring is about collecting data and observability is about understanding data.
+                                 Monitory is reacting to problems while observavility is fixing them in real time.
+
+
+                Q1. Logging in Monolithic Apps  vs Logging in Microservices ?
+                        - Logging in Monolithic Apps :
+                                    In monolithic apps, all Of the code is in a single codebase. This means that all Of the logs are also in a single location. This 
+                                    makes it easy to find and troubleshoot problems, as you only need to look in one place. 
+                        - Logging in Microservices :
+                                   - Logging in microservices is complex. This is because each service has its own logs. This means that you need to 1ook in multiple 
+                                     places to find all of the logs for a particular request.
+                                   - To address this challenge, microservices architectures often use centralized logging. Centralized logging collects logs from all 
+                                     of the services in the architecture and stores them in a single location. This makes it easier to find and troubleshoot problems, 
+                                     as you only need to look in one place.
+                        - Managing centralized logs with Grafana, Grafana Loki & Alloy :
+                             • Grafana :
+                                  - Grafana is an open-source analytics and interactive visualization web application. It provides charts, graphs, and alerts for the 
+                                    web when connected to supported data sources. It can be easily installed using Docker or Docker Compose.
+                                  - Grafana is a popular tool for visualizing metrics, logs, and traces from a variety of sources. It is used by organizations of all 
+                                    sizes to monitor their applications and infrastructure.
+                             • Grafana Loki :
+                                  - it is one of the tools of Grafana.
+                                  - Grafana Loki is a log aggregation system that collects and stores logs from different applications in one place, so we can easily 
+                                    search and troubleshoot problems.
+                                  - FROM GRAFANA LOKI 3.0, Alloy replaced Promtail.
+                             • Promtail :
+                                  - Grafana Alloy is a lightweight log agent that ships logs From your containers to Loki. It is easy to configure and can be used to 
+                                    collect logs From a wide variety OF sources.
+                          NOTE:- Together, Grafana Loki and Alloy provide a powerful logging solution that can help you to understand and troubleshoot your applications. 
+                                 Grafana provides visualization of the log lines captured within Loki.
+                                       .--------------------------.
+                                       |                          |
+                                       | API Gateway ,            |                        .--------------------------.
+                                       | Loans Microservices ,    |                        |        Grafana           |
+                                       | Cards Microservices ,    |                        | Query,search,visualize   |
+                                       | Accounts Microservices   |                        | the logs with Loki as    |
+                                       |                          |                        |     datasource           |
+                                       '--------------------------'                        '--------------------------'
+                                                    ↑                                                   |
+                                                    |                                                   |
+                                                    |  Fetches logs                                     |  Query & Search logs
+                                                    |                                                   |
+                                                    |                                                   |
+                                       .--------------------------.                                     ↓
+                                       |        Alloy             |                          .------------------------.
+                                       | collects logs From       |      Forward logs        |        Loki            |
+                                       | containers, process &    |-------------------------→| log aggregation system |
+                                       | Forwards them Loki       |                          '------------------------'
+                                       '--------------------------'         
+
+                                 Sample demo OF logging using Grafana, Loki & Alloy :
+                                       - Reference to see diagram, how it workflow and steps to implement it:  
+                                                         - https://grafana.com/docs/loki/latest/get-started/quick-start/quick-start/
+                                                         - cloud-native applications generate logs as events and send them to the standard output, without being 
+                                                           concerned about the processing or storage OF those logs.
+                                                         One advantage of treating logs as event streams and emitting them to stdout is that it decouples the application 
+                                                           From the log processing infrastructure. The application can focus on its core Functionality without being tied
+                                                           to a specific logging implementation or storage solution. The infrastructure, on the other hand, can handle the 
+                                                           collection, aggregation, and storage of logs using appropriate tools and services.
+                                                        15-Factor methodology recommends the same to treat logs as events streamed to the standard output and not concern
+                                                           with how they are processed or stored.
+                                       - for more refere madan reddy notes.
+
+
+
+
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 
 
 
 
@@ -2325,21 +2459,6 @@ microservice 2 when the response from microservice 2 is recieved by the microser
 
 
 
-   
-SECTION 09 :
-        Gateway,Routing & Cross Cutting concerns in Microservices
------------------------------------------------------------------
-                Q1. 
-                Q1. 
-                Q1. 
-                Q1.
-                Q1. 
-                Q1.
-                Q1. 
-                Q1.
-                Q1. 
-                Q1.
-                Q1. 
 SECTION 09 :
         Gateway,Routing & Cross Cutting concerns in Microservices
 -----------------------------------------------------------------

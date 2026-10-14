@@ -2381,6 +2381,11 @@ SECTION 11 :
                                    - To address this challenge, microservices architectures often use centralized logging. Centralized logging collects logs from all 
                                      of the services in the architecture and stores them in a single location. This makes it easier to find and troubleshoot problems, 
                                      as you only need to look in one place.
+
+
+                                               ONE OF THE PILLARS of OBSERVABILITY LOGGING EXPLAINED.
+                                               ''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
                         - Managing centralized logs with Grafana, Grafana Loki & Alloy :
                              • Grafana :
                                   - Grafana is an open-source analytics and interactive visualization web application. It provides charts, graphs, and alerts for the 
@@ -2392,7 +2397,7 @@ SECTION 11 :
                                   - Grafana Loki is a log aggregation system that collects and stores logs from different applications in one place, so we can easily 
                                     search and troubleshoot problems.
                                   - FROM GRAFANA LOKI 3.0, Alloy replaced Promtail.
-                             • Promtail :
+                             • Alloy :
                                   - Grafana Alloy is a lightweight log agent that ships logs From your containers to Loki. It is easy to configure and can be used to 
                                     collect logs From a wide variety OF sources.
                           NOTE:- Together, Grafana Loki and Alloy provide a powerful logging solution that can help you to understand and troubleshoot your applications. 
@@ -2431,6 +2436,46 @@ SECTION 11 :
                                        - for more refere madan reddy notes.
 
 
+                                               ONE OF THE PILLARS of OBSERVABILITY METRICS EXPLAINED.
+                                               ''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+                        - Metrics & monitoring with Spring Boot Actuator, Micrometer, Prometheus & Grafana :
+                               Note:-
+                                   Event logs are essential for monitoring applications, but they don't provide enough data to answer all Of the questions we need to 
+                                   know. TO answer questions like CPU usage, memory usage, threads usage, error requests etc. & properly monitor, manage, and troubleshoot
+                                   an application in production, we need more data.
+                                   Metrics are numerical measurements of an application's performance, collected and aggregated at regular intervals. They can be used 
+                                   to monitor the application's health and performance, and to set alerts or notifications when thresholds are exceeded.
+                             • 1.ACTUATOR :
+                                  - Actuator is mainly used to expose operational information about the running application — health, metrics, info, dump, env, etc. 
+                                  - It uses HTTP endpoints or JMX beans to enable us to interact with it.
+                             • 2.MICROMETER :
+                                  - Micrometer automatically exposes /actuator/metrics data into something your monitoring system can understand. 
+                                  - All you need to do is include that vendor-specific micrometer dependency in your application. Think SLF4J, but for metrics.
+                             • 3.Prometheus :
+                                  - The most common format for exporting metrics is the one used by Prometheus,which is "an open-source systems monitoring and alerting
+                                    toolkit". Just as Loki aggregates and stores event logs, Prometheus does the same with metrics.
+                             • 1.Grafana :
+                                  - Grafana is a visualization tool that can be used to create dashboards and charts from Prometheus data.
+                                       .--------------------------.
+                                       |                          |
+                                       | API Gateway ,            |                        .---------------------------.
+                                       | Loans Microservices ,    |                        |        Grafana            |
+                                       | Cards Microservices ,    |                        | Query,search,visualize the|
+                                       | Accounts Microservices   |                        | metrics,build dashboard,  |
+                                       |                          |                        | alerts with Prometheus as |
+                                       '--------------------------'                        |      datasource           |                       
+                     Microservices with the         ↑                                      '--------------------------'                                        
+                     help of actuator and           |                                                   |
+                     micrometer exposes             |                                                   |  Query metrics from
+                     metrics information            |                                                   |
+                                                    |                                                   |
+                                                    |                                                   ↓
+                                                    |                                        .------------------------.
+                                                    |   scrapes metrics from services        |     Prometheus         |
+                                                    '---------------------------------------→|  Metrics acregator &   |
+                                                                                             |   monitoring systen    |                   
+                                                                                             '------------------------'
 
 
                 Q1.

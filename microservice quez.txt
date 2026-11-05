@@ -2323,52 +2323,378 @@ SECTION 11 :
                                         notifications for any abnormal behavior of the services?
                        
                 Q1. WHAT IS OBSERVABILITY ?
-                        - Observability is the ability to understand the internal state of a system by observing its outputs. 
-                        - In today's cloud-native world, observability is essential. 
+                        Your service is throwing 500s errors in production at 2 AM. You have no idea why. where Observability (helps) is the difference between guessing
+                        and knowing. 
                         - The three pillars of observability are:
                                     - Metrics: 
-                                            - Metrics tell you how your application behaves.
-                                            - Metrics are quantitative measurements of the health of a system.
+                                            - numeric measurements over time. "How much, how often."
                                             - They can be used to track things like CPU usage, memory usage, and response times.
                                     - Logs: 
                                             - logs reveal what the application is communicating at every step. 
                                             - Logs are a record of events that occur in a system.
                                             - They can be used to track things like errors, exceptions, and other unexpected events.
                                     - Traces: 
-                                            - traces show how requests move across classes.
-                                            - Traces are a record of the path that a request takes through a system. 
+                                            - the journey Of one request across services. "Where did the time go".  
                                             - They can be used to track the performance of a request and to identify bottlenecks(rukawat).
-                              NOTE:- By collecting and analyzing data from these three sources, you can gain a comprehensive(poora aur detailed) understanding of the 
-                                     internal state of your backend application. This understanding can be used to identify and troubleshoot problems, 
-                                     improve performance, and ensure the overall health of your system.
+                              NOTE:- Observability is the ability to understand the internal state of a system by observing its outputs. In the context of microservices,
+                                     observability is achieved by collecting and analyzing data from a variety Of sources, such as metrics, logs, and traces.
 
-                Q1. WHAT IS MONITORING ?
-                           - Monitoring in microservices involves checking the telemetry data available for the application and defining alerts for known failure states. 
-                             This process collects and analyzes data from a system to identify and troubleshoot problems, as well as track the health of individual 
-                             microservices and the overall health of the microservices network.
-                           - Monitoring in microservices is because it allows you to:
-                                   - Identify and troubleshoot problems: 
-                                               By collecting and analyzing data from your microservices, you can identify problems before they cause outages or other 
-                                               disruptions.
-                                   - Track the health of your microservices: 
-                                                Monitoring can help you to track the health of your microservices, so you can identify any microservices that are 
-                                                underperforming or that are experiencing problems
-                                   - Optimize your microservices:
-                                                By monitoring your microservices, you can identify areas where you can optimize your microservices to improve performance 
-                                                and reliability.
-                              NOTE:- Monitoring and observability can be considered as two sides of the same coin.Both rely on the same types of telemetry data to enable 
-                                     insight into software distributed systems. Those data types — metrics, traces, and logs — are often referred to as the three pillars
-                                     of observability.
+                Q2. WHAT IS Difference b/w Monitoring vs. observability ?
+
                            - Observability vs. Monitoring :
-                                                    | Feature  |              Monitoring            |              Observability                    |
-                                                    |----------|------------------------------------|-----------------------------------------------|
-                                                    | Purpose  | Identify and troubleshoot problems | Understand the internal state of a system     |
-                                                    | Data     | Metrics, traces, and logs          | Metrics, traces, logs, and other data sources |
-                                                    | Goal     | Identify problems                  | Understand how a system works                 |
-                                                    | Approach | Reactive                           | Proactive                                     |
+                                    | Feature  |              Monitoring                                |              Observability                                   |
+                                    |----------|--------------------------------------------------------|--------------------------------------------------------------|
+                                    | Purpose  | Identify and troubleshoot problems                     | Understand the internal state of a system                    |
+                                    | Data     | Metrics, traces, and logs                              | Metrics, traces, logs, and other data sources                |
+                                    | Goal     | Detect when something is wrong                         | Understand why something is wrong and how the system works   |
+                                    | Approach | Reactive: responds to detected problems                | Proactive : explores data to understand problems             |
+                                    | Example  | Smoke alarm rings                                      | Find which room has smoke, what caused it, and when it started     |
+                                    | Focus    | Detecting problems using predefined metrics and alerts | Investigating problems using metrics, logs, and traces       |
                               NOTE:- 
                                  In other words, monitoring is about collecting data and observability is about understanding data.
                                  Monitory is reacting to problems while observavility is fixing them in real time.
+
+
+                Q3. Trace ID vs Span ID vs Correlation ID ?
+
+                           | Feature           | Trace ID                        | Span ID                              | Correlation ID                               |
+                           | ----------------- | ------------------------------- | ------------------------------------ | -------------------------------------------- |
+                           | Easy meaning      | Puri request ki ID              | Request ke ek operation ki ID        | Related logs/events ko connect karne ki ID   |
+                           | Purpose           | Puri journey track karna        | Ek particular operation track karna  | Related events ko aapas mein correlate karna |
+                           | Kitni IDs?        | Ek trace ke liye same Trace ID  | Har span ki alag Span ID             | Related events mein usually same ID          |
+                           | Example           | `T100`                          | `S101`, `S102`, `S103`               | `C500`                                       |
+                           | Used in           | Distributed tracing             | Distributed tracing                  | Log correlation aur request tracking         |
+                           | Who generate ID?  | Tracing framework automatically | Tracing framework automatically      | Custom code ya existing middleware           |
+                  - Easy to remeber :
+                          Trace ID = Where did the whole request go?
+                          Span ID = What happened in this particular operation?
+                          Correlation ID = Which logs or events are related?
+
+
+                       Telemetry, OpenTeIemetry & Micrometer
+                      ---------------------------------------
+
+                - Your microservices are a black box :
+                        - It's 2 AM. The Accounts service suddenly feels slow. but we don't know the reason.
+                        - Possible reasons:
+                                        - Is it the database? 
+                                        - A downstream call to Cards or Loans? Which instance?
+                                        - With nothing flowing out of your services, you're debugging blind — guessing, restarting, hoping.
+                                        - You fix what you can't see. so to solve this, we need a concept called Telemetry
+
+                Q4. What is telemetry?
+                        - Telemetry is the automatic collection of data from a system,sent somewhere else so the system can be understood from the outside.
+                        - tele (remote) + metron (mesure) = measuring from a distance. 
+
+                Q5. What is OpenTelemetry (OTel)?
+                        - OpenTelemetry is An open-source, vendor-neutral(Not tied to any single company) standard for producing and shipping telemetry.
+                        - OpenTelemetry is supported by the CNCF(Cloud Native Computing Foundation), which is an organization that also supports Kubernetes.
+                        - Covers all three pillars: logs, metrics and traces, under one roof.
+                        - OpenTelemetry uses OTLP as a standard communication protocol to send telemetry data(metrics,logs,and traces) from applications to other systems.
+                               - Works over: HTTP & gRPC
+                               - OTLP is to observability what HTTP is to web.
+                               - Because of OTLP:
+                                        - Spring Boot doesn't care where data goes
+                                        - Backends(LGTM) don't care who produced the data
+                        - Set up telemetry once and send the data to any backend — Grafana today, another tool tomorrow. No vendor lock-in.
+
+
+                        .-----------------.                 .-----------------------.
+                        |      Logs       |---------------->|                       |
+                        '-----------------'                 |                       |
+                                                            |                       |                            .-------------------.
+                        .-----------------.                 |                       |                            |      Any          |
+                        |    Metrics      |---------------->|    OpenTeIemetry      |--------------------------->|    Backend        |
+                        '-----------------'                 |        (OTLP)         |                            |                   |
+                                                            |                       |                            '-------------------'
+                        .-----------------.                 |                       |
+                        |    Traces       |---------------->|                       |
+                        '-----------------'                 |                       |
+                                                            '-----------------------'
+
+
+                Q6. What is Micrometer?
+                              • Similar to SLF4J, but for Metrics :
+                                     - Micrometer is similar to SLF4J, but instead of handling logs, it helps applications collect and report metrics.
+                              • Vendor-Neutral Facade :
+                                     - Micrometer provides a common way to collect metrics and send them to different supported monitoring systems.
+                                     - Write your measurement code once and use it with different monitoring tools.
+                              • Metrics Instrumentation(Measure karne ki facility add karna) Library :
+                                     - Micrometer is a metrics instrumentation library for Java/JVM applications. It helps measure application performance, such as 
+                                       request count, response time, and error count.
+                              • Integrated with Spring Boot :
+                                     - Actuator is built on top of Micrometer.
+                                     - Spring Boot Actuator uses Micrometer to provide application metrics through endpoints such as /actuator/metrics.
+                              • Dimensional Metrics (Tags) :
+                                     - Micrometer supports tags that help filter and analyze metrics by different categories,such as URI,HTTP status,and application instance.
+                                     - Example: You can check the number of requests for a particular URI or HTTP status.
+                              • Micrometer Tracing :
+                                     - Micrometer has a related project called Micrometer Tracing, which helps collect and propagate distributed tracing information 
+                                       across multiple microservices.
+                                     - Example: Accounts → Loans → Cards
+                 In simple words: Micrometer helps Spring Boot applications measure their performance and report those measurements to monitoring tools.
+
+
+                Q7. Why lean/need on Micrometer?
+                             - Spring Boot Actuator provides many built-in application metrics through Micrometer, so you don't need to write code to measure everything
+                               manually.
+                             - Examples of Built-in Metrics :
+                                             - JVM Memory: How much memory the Java application is using.
+                                             - HTTP Latency: How much time an API takes to respond.
+                                             - Database Connection Pool: How many database connections are active or available.
+                                             - Cache Hits: How often requested data is found in the cache.
+                             - Available Through Actuator :
+                                             - When you add and configure Spring Boot Actuator, many built-in metrics become available through endpoints such as
+                                               /actuator/metrics.
+
+
+                Q8. If OpenTelemetry already handles all three pillars...why do we still need Micrometer for metrics?
+                             - They Are Different Layers, Not Rivals :
+                                      - Micrometer and OpenTelemetry can work together. They have different responsibilities, although some of their capabilities overlap.
+                                             - Micrometer: 
+                                                        Provides an API that Spring Boot applications and libraries can use to record metrics.
+                                             - OpenTelemetry: 
+                                                     Provides tools and standards to generate, collect, process, and export telemetry data, including metrics, logs,
+                                                     and traces.
+                                      - Example Exactly like logging :
+                                         • LOGGING 
+                                                - SLF4J (Facade): Provides a common API that application code uses to write logs.
+                                                - Logback (Logging Implementation): Performs the actual logging work.
+                                              NOTE:- Application code uses SLF4J, while the underlying logging implementation can be changed with minimal code changes.
+                                         • Metrics
+                                                - Micrometer (Metrics Facade): Provides a common API for recording application metrics.
+                                                - OpenTelemetry (Telemetry Framework): Can collect and export metrics using its SDK and instrumentation, depending on 
+                                                                                       the integration and configuration.
+                             -  What If We Remove Micrometer?
+                                          - If we remove Micrometer, we lose its easy way of collecting metrics and its integration with Spring Boot Actuator.
+                                          - We can still use OpenTelemetry directly, but we may need to write extra configuration and set up other integrations manually.
+                                                  Typical setup mein:
+                                                             1. OpenTelemetry SDK add karna.
+                                                             2. OpenTelemetry ke saath compatible instrumentation configure karna,as HTTP requests aur server timings ke liye.
+                                                             3. Metrics collect karne ke liye MeterProvider aur required metric instruments configure karna.
+                                                             4. Metrics ko export karne ke liye OpenTelemetry exporter aur collector/backend configure karna.
+
+                Q9. Who Actually Generates Each Signal :
+                    | Point                                                 | Traces                                                                                        | Metrics                                                                                               | Logs                                                                                 |
+                    | ----------------------------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+                    | What is it?                                           | Request ka complete journey across services.                                                  | Application performance ke numbers, jaise request count aur response time.                            | Application ke messages, jaise INFO, WARN aur ERROR.                                 |
+                    | Generated by                                          | Spring instrumentation aur Micrometer Tracing, configured integration ke through.             | Micrometer aur uski instrumentation.                                                                  | Application aur uski libraries ke normal log statements.                             |
+                    | First component                                       | Micrometer Observation / Tracing API request operations ko observe karne mein help karti hai. | Micrometer `MeterRegistry` metrics ko collect aur record karta hai.                                   | Logback application ke log messages handle karta hai.                                |
+                    | Next component                                        | OpenTelemetry SDK trace data ko process aur export karne mein help karta hai.                 | Micrometer `OtlpMeterRegistry` metrics ko OTLP format mein export karta hai.                          | OpenTelemetry Logback Appender log messages ko OpenTelemetry tak pahunchata hai.     |
+                    | Exported by                                           | OpenTelemetry SDK + OTLP exporter.                                                            | Micrometer `OtlpMeterRegistry`.                                                                       | OpenTelemetry SDK + configured log exporter.                                         |
+                    | Does OpenTelemetry SDK need to be in the export path? | Haan, is particular setup mein.                                                               | Nahi, is setup mein Micrometer directly export karta hai.                                             | Haan, is particular setup mein.                                                      |
+                    | What data is sent?                                    | Trace ID, Span ID, operation duration aur request journey ki information.                     | HTTP request count, response time, JVM memory, database connection pool metrics aur cache statistics. | Log messages, jaise `Account created successfully` aur `Database connection failed`. |
+                    | Protocol                                              | OTLP                                                                                          | OTLP                                                                                                  | OTLP                                                                                 |
+                    | Endpoint                                              | `/v1/traces`                                                                                  | `/v1/metrics`                                                                                         | `/v1/logs`                                                                           |
+                    | Example URL                                           | `http://localhost:4318/v1/traces`                                                             | `http://localhost:4318/v1/metrics`                                                                    | `http://localhost:4318/v1/logs`                                                      |
+                    | Purpose                                               | Pata lagana ki request kis service ya operation mein slow hui.                                | Application ki performance aur resource usage measure karna.                                          | Application mein kya events ya errors hue, ye samajhna.                              |
+
+
+                Q10. LGTM Stack (The Backend) ?   
+
+                        Think of observability as a pipeline:
+
+                                        Your Spring Boot App ------> Telemetry Data ------>  Transport ------>  Backend ------>  Dashboards 
+
+                                                                                                                          Obsenability
+                                                                                                                       frontend (visualization)
+                                         .-----------------.                            .-----------------.             .-----------------.
+                                         |                 |                            |                 |             |                 |
+                                         | Applications    |    OTel, OTLP              |    LGTM         |  queries    |                 |
+                                         |    or           |--------------------------->|  Observability  |------------>|                 |
+                                         | Infrastructure  |  Generate, collect. manage |backend (storage)|<------------|                 |
+                                         |                 |  and export telemetry data |                 |             |                 |
+                                         '-----------------'                            '-----------------'             '-----------------'
+                                                                                                                     --------------------------
+                                                                                                                               /   \
+
+                                                - LGTM is a popular observability backend stack. tools used to store, manage, query, and visualize telemetry data  
+                                                  such as logs, metrics, and traces collected from applications.They do not collect data from your app directly. 
+                                                - The name LGTM comes from the first letters of four tools:  
+                                                                        | Letter | Tool    | Purpose                                                |
+                                                                        | ------ | ------- | ------------------------------------------------------ |
+                                                                        | L      | Loki    | Logs — collects and stores application logs            |
+                                                                        | G      | Grafana | UI — used to visualize data and create dashboards      |
+                                                                        | T      | Tempo   | Traces — distributed tracing backend                   |
+                                                                        | M      | Mimir   | Metrics — long-term storage for Prometheus metrics     | 
+                                                               LOKI:- Loki is a log aggregation system,whatever logs our services going to push using OTLP and 
+                                                                      opentelemetry they will be received and store by a product called loki. evenif you have 100
+                                                                      microservices with the multiple instances all their logs will be store at centerlized location.
+                                                               Grafana:- to visuallize all these data likes, logs,metrics and disributed tracing we need to use grafana
+                                                                         so Grafana is a UI component under the grafana ecosystem, by using this can query the 
+                                                                         obseravaility data,we can visualize it,we can build dashboard and build altert as well based 
+                                                                         upon the data.
+                                                               Tempo:- its another product from Grafana,using this product we can visualy see how our traffic or request
+                                                                       is following inside our network,basically this tempo , it is going to levarage traceId,spanId
+                                                                       that our services generates,this tempo product, it is going to visually show you how your request
+                                                                       travel over multiple services
+                                                               Mimir:- it is another product from grafana,this product is responsible to accept all the metrics from 
+                                                                       the services by using OTLP and store them at centeralized location so that we can visuallize 
+                                                                       all of them using gafana.
+                                                                                                                                                    
+                                                - Difference b/w Prometheus and Mimir :                    
+                                | Feature         | Prometheus                              | Grafana Mimir                                                            |
+                                | --------------- | --------------------------------------- | -------------------------------------------------------------------------|
+                                | Purpose         | Metrics collect aur monitor karna       | Metrics ko large scale par store aur query karna                         |
+                                | Data Collection | Applications se metrics collect krta hai| Prometheus ya OpenTelemetry jaise sources se metrics receive kr skta hai |
+                                | Query Language  | PromQL                                  | PromQL                                                                   |
+                                | Best Use Case   | Small to medium monitoring setups       | Large-scale monitoring aur centralized metrics storage                   |
+                              Example :
+                                   - Prometheus : Tere Accounts Microservice ka CPU usage, API request count aur response time collect karta hai.
+                                   - Grafana Mimir : Bhut sare microservices se ane wale metrics ko large scale pr store krta hai, taki unhe query aur analyze kiya ja ske.
+                              Note:- 
+                                  Grafana Provides all four specialists inside a single image, grafana/otel-lgtm. We will use the same for our local setup. But in 
+                                  production setups eventually DevOps team split these into separate services or containers.
+                                 IMAGE: docker run —d —p 3000:3000 —p 4317:4317 —p 4318:4318 grafana/otel—lgtm
+                                 Example :
+                                                 grafana/otel-lgtm (Single Docker Image)
+                                                              |
+                                                              |-- Grafana    → Visualization → port: 3000  
+                                                              |
+                                                              |-- Loki       → Logs 
+                                                              |
+                                                              |-- Tempo      → Traces
+                                                              |
+                                                              |-- Prometheus → Metrics
+
+
+                             - Implementing Observability in microservices :
+
+                                Step 1 — Adding below dependencies in pom.xml (All Apps: accounts,cards,loans,eurekaserver,configserver,gatewayserver..etc) :
+
+                                        		<dependency>
+			                                        <groupId>org.springframework.boot</groupId>
+			                                        <artifactId>spring-boot-starter-opentelemetry</artifactId>
+                                        		</dependency>
+                                        		<dependency>
+			                                        <groupId>io.opentelemetry.instrumentation</groupId>
+			                                        <artifactId>opentelemetry-logback-appender-1.0</artifactId>
+			                                        <version>2.31.1-alpha</version>
+                                        		</dependency>
+                                        		<dependency>
+			                                        <groupId>io.opentelemetry</groupId>
+			                                        <artifactId>opentelemetry-api-incubator</artifactId>
+			                                        <version>1.62.0-alpha</version>
+                                        		</dependency>
+                                    - spring-boot-starter-opentelemetry :
+                                             • Master switch: 
+                                                     - Main dependency that enables OpenTelemetry integration.
+                                             • Auto-configuration: 
+                                                     - Spring Boot automatically configures the required components based on the supported settings provided in 
+                                                       application.yml.
+                                             • Tracer:
+                                                     - Helps generate and manage distributed traces.
+                                             • OTLP Exporter: 
+                                                     - Sends observability data (Traces, Metrics, Logs) to an external observability system using OTLP protocol.
+                                             • Metrics Registry:
+                                                     - Manages application metrics and helps export them.
+                                    - opentelemetry-logback-appender-1.0 :
+                                             • Log Trace Bridge: 
+                                                     - Connects application logs with distributed traces.
+                                             • Trace ID: 
+                                                     - Adds the currently active Trace ID to log records.
+                                             • Span ID: 
+                                                     - Adds the currently active Span ID to log records.
+                                             • Logback Appender: 
+                                                     - Collects Logback log events and sends them to OpenTelemetry.
+                                             • OTLP: 
+                                                     - Sends log data to an external observability system using OTLP protocol.
+                                    - opentelemetry-api-incubator :
+                                             • Supporting Library: 
+                                                     - Helps other OpenTelemetry components by providing additional APIs.
+                                             • Not a Standalone Feature: 
+                                                     - It does not independently generate or export Logs, Metrics or Traces.
+                                             • Extra APIs: 
+                                                     - Provides some additional/experimental OpenTelemetry API features.
+                                             • Dependency Support: 
+                                                     - The Logback Appender may use some of these APIs, so this dependency can provide the required classes during 
+                                                       compilation and runtime.
+
+                                Step 2 — Adding below properties in application.yml (All Apps) :
+                                                         management:
+                                                           opentelemetry:
+                                                             resource-attributes:
+                                                               service.name: ${spring.application.name}
+                                                               deployment.environment: "development"
+                                                             logging:
+                                                               export:
+                                                                 otlp:
+                                                                   endpoint: http://localhost:4318/v1/logs
+                                                             tracing:
+                                                               export:
+                                                                 otlp:
+                                                                   endpoint: http://localhost:4318/v1/traces
+                                                           tracing:
+                                                             sampling:
+                                                               probability: 1.0
+                                                           otlp:
+                                                             metrics:
+                                                               export:
+                                                                 url: http://localhost:4318/v1/metrics
+                                                                 step: 10s
+                                                           metrics:
+                                                             tags:
+                                                               application: ${spring.application.name}
+                                                         logging:
+                                                           pattern:
+                                                             console: ${CONSOLE_LOG_PATTERN:%green(%d{HH:mm:ss.SSS}) %blue(%-5level) %red([%thread]) %yellow(%logger{15}) %magenta([traceId=%X{traceId:-},spanId=%X{spanId:-}]) - %cyan(%msg%n)}
+ 
+
+                                Step 3 — Create logback-spring.xml file under resources folder (All Apps) :
+                                               <configuration>
+                                                   <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+                                                   <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+                                                   <appender name="OpenTelemetry" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+                                                       <mdcAttributesIncluded>*</mdcAttributesIncluded>
+                                                       <captureCodeAttributes>true</captureCodeAttributes>
+                                                   </appender>
+
+                                                   <root level="INFO">
+                                                       <appender-ref ref="CONSOLE"/>
+                                                       <appender-ref ref="OpenTelemetry"/>
+                                                   </root>
+                                               </configuration>
+                            NOTE:- Logback Configuration for OpenTelemetry,
+                                 - Console Appender: Prints logs on the console using Spring Boot's default logging pattern.
+                                 - logging.pattern.console: Allows us to customize the format of console logs.
+                                 - OpenTelemetryAppender: Sends application log events to OpenTelemetry.
+                                 - OTLP: Transfers logs to the observability backend.
+                                 - MDC Fields: Attaches additional information to logs, including Trace ID and Span ID.
+                                 - Loki: Stores logs so that we can search and analyze them.
+
+                                Step 4 — Create bean that connects OpenTelemetryAppender with SDK (All Apps) :
+                                                    @Configuration
+                                                    public class OpenTelemetryLoggingConfig {
+
+                                                        @Bean
+                                                        ApplicationListener<ApplicationReadyEvent> openTelemetryAppenderInstaller
+                                                                (OpenTelemetry openTelemetry) {
+                                                            return event -> OpenTelemetryAppender.install(openTelemetry);
+                                                        }
+                                                    }
+                            NOTE:- It registers a bean that, once the app is fully started, calls OpenTelemetryAppender.install(openTelemetry) — connecting the
+                                   appender declared in logback-spring.xml to the actual configured OpenTelemetry SDK instance. Without this, the appender
+                                   wouldn't know which tracer to pull the active traceld/spanld from, so log-to-trace correlation in Loki/Tempo wouldn't actually
+                                   work.
+
+                                Step 5 — 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
                 Q1. Logging in Monolithic Apps  vs Logging in Microservices ?
@@ -2446,6 +2772,9 @@ SECTION 11 :
                                    an application in production, we need more data.
                                    Metrics are numerical measurements of an application's performance, collected and aggregated at regular intervals. They can be used 
                                    to monitor the application's health and performance, and to set alerts or notifications when thresholds are exceeded.
+                                                                             or
+                                   Metrics numerical values hote hain jo application ki performance aur health ko measure karte hain.
+                                   Examples: CPU usage, memory usage, request count, response time.
                              • 1.ACTUATOR :
                                   - Actuator is mainly used to expose operational information about the running application — health, metrics, info, dump, env, etc. 
                                   - It uses HTTP endpoints or JMX beans to enable us to interact with it.
@@ -2477,7 +2806,26 @@ SECTION 11 :
                                                                                              |   monitoring systen    |                   
                                                                                              '------------------------'
 
+                        - Setup of micrometer inside microservices :
+                               1. in every microservice add actuator,micrometer dependency :
 
+                                                
+                                                         	<dependency>
+			                                                 <groupId>io.micrometer</groupId>
+			                                                 <artifactId>micrometer-registry-prometheus</artifactId>
+		                                                </dependency>
+                               2. in every microservice add :
+                                                       management:
+                                                            metrics:
+                                                              tags:
+                                                                application: ${spring.application.name}
+                              3. to test even exposing metrics :
+                                               - metrics endpoint: http://localhost:8080/actuator/metrics
+                                               - metrics endpoint: http://localhost:8080/actuator/prometheus      #port jispe tumhara application running ho.
+
+
+                                               ONE OF THE PILLARS of OBSERVABILITY TRACE EXPLAINED.
+                                               ''''''''''''''''''''''''''''''''''''''''''''''''''''''
                 Q1.
                 Q1. 
                 Q1.

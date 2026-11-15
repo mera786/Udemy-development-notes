@@ -2678,7 +2678,162 @@ SECTION 11 :
                                    wouldn't know which tracer to pull the active traceld/spanld from, so log-to-trace correlation in Loki/Tempo wouldn't actually
                                    work.
 
-                                Step 5 — 
+                                Step 5 —  Adding below property in Gatewayserver application.yml
+                                               spring:
+                                                 reactor:
+                                                   context-propagation: auto
+                            NOTE:- Spring Cloud Gateway Reactor (Reactive Programming) par kaam karta hai, jahan request processing ke dauran different threads use ho 
+                                   sakte hain.spring.reactor.context-propagation: auto ka kaam Trace ID, Span ID jaise context information ko automatically different 
+                                   threads ke beech carry karna hai.Without this property: Thread switch hone par tracing context lose ho sakta hai, jiski wajah se 
+                                   Tempo/Loki mein tracing aur logs properly correlate nahi ho sakte.
+                                   Remember: Context Propagation = Thread switching ke dauran tracing information ko maintain karna.
+
+                                Step 6 — Create below beans in Accounts (Since it calls other internal services as well)
+                                       
+                                        Add Dependency :
+		                                         <dependency>
+					                      <groupId>org.springframework.boot</groupId>
+					                      <artifactId>spring-boot-starter-restclient</artifactId>
+				                         </dependency>
+                                      Note:- Two beans fixing one bug: traces from accounts calling cards/loans were breaking into disconnected new traces instead of
+                                        continuing the caller's trace.
+                                            @Configuration
+                                            public class HttpClientObservabilityConfig {
+                                                @Bean
+                                                RestClientCustomizer tracingRestClientCustomizer(ObservationRegistry observationRegistry) {
+                                                    ClientRequestObservationConvention convention = new DefaultClientRequestObservationConvention();
+                                                    return new ObservationRestClientCustomizer(observationRegistry, convention);
+                                                }
+                                                @Bean
+                                                Customizer<Resilience4JCircuitBreakerFactory> contextPropagatingExecutorCustomizer() {
+                                                    ContextSnapshotFactory snapshotFactory = ContextSnapshotFactory.builder().build();
+                                                    return factory -> factory.configureExecutorService(
+                                                            ContextExecutorService.wrap(Executors.newCachedThreadPool(), snapshotFactory));
+                                                }
+                                            }
+                                      Bean 1 – RestClient tracing :
+                                            Problem: 
+                                                 Accounts Service jab RestClient ki help se Cards/Loans Service ko call karta hai, toh us outgoing HTTP request ki 
+                                                 tracing properly instrument honi chahiye.
+                                            Solution: 
+                                                 Ye Bean RestClient ke saath ObservationRegistry configure karta hai, taaki outgoing HTTP calls ki tracing aur 
+                                                 observations record ho sakein.
+                                            Simple meaning: RestClient calls ki tracing enable/configure karna.
+                                      Bean 2 – Context Propagation for Circuit Breaker :
+                                            Problem: Accounts Service Resilience4j Circuit Breaker use karta hai. Blocking Circuit Breaker protected call ko execute
+                                                     karne ke liye separate worker thread use karta hai.New thread par existing Trace ID / Span ID automatically available
+                                                     nahi ho sakta. Is wajah se tracing break ho sakti hai.
+                                            Solution: 
+                                                  ContextExecutorService.wrap() executor ko wrap karta hai, jo current context ka snapshot lekar worker thread tak 
+                                                  propagate karta hai.
+                                            Simple meaning: Circuit Breaker ke separate worker thread mein bhi tracing context maintain karna.
+
+
+                              Putting the pieces together, end to end:
+                                     1. A request comes in (e.g. through gatewayserver, ). Spring Boot's OpenTelemetry starter starts atrace and creates a span for it,
+                                        tagged with traceld/spanld.
+                                     2. That trace context has to survive every hop the 
+                                              - Inside a reactive pipeline (gatewayserver) spring.reactor.context-propagation: auto carries it across thread switches.
+                                              - Across a blocking call protected by Resiliences) the ContextExecutorService wrapper carries itonto the worker thread.
+                                              - Without either fix, the downstream service would start a brand-new, disconnected trace instead of continuing the caller's.
+                                     3. Every log line written during that request gets picked up by thé OpenTelemetryAppender (declared in logback-spring.xml). Because
+                                        OpenTeIemetryAppender.instaII(openTeIemetry) was called at startup (OpenTeIemetryLoggingConfig), the appender knowsthe active
+                                        span and stamps the log with its traceld/spanld — same reason it also prints to your console via the pattern you customized.
+                                     4. Logs, traces and metrics all get pushed out over OTLP — not scraped, pushed — to http://localhost:4318/v1/{logs,traces,metrics}
+                                        (management.opentelemetry.* / management.otlp.metrics.* config), each onetagged with service.name / application so you know
+                                        which service it came from. Metrics push every los; traces are sampled at probability: 1.0 (all of them).
+                                     5. The grafana-lgtm container receives all three on ports 4317/4318 and routes each signal into its matching backend inside the 
+                                        same image: logs Loki, traces Tempo, metrics Mimir.
+                                     6. Grafana (port 3000, same container) reads all three backends — that's how a dashboard panel can show a metric, a log line can 
+                                        carry a traceld, and clicking that traceld can jump you into the full trace in Tempo.
+
+                Q11. Custom Metrics
+                              1. Custom Metrics: Why We Need Them ?
+                                           - Free metrics (JVM, HTTP, DB pool) = technical health only. They can't answer business questions:
+                                                               • How many accounts created today?
+                                                               • How many loans updated this hour?
+                                                               • How many cards deleted this week?
+                                   Note:- Only we know what these events mean we must define them, Tool for the job: MeterRegistry (from Micrometer)
+                                           - Getting the MeterRegistry :
+                                                      MeterRegistry = the central notebook where all metrics are recorded
+                                                      Spring Boot already creates it as a bean -> 5 we just inject it.
+                                                      With Lombok @AllArgsConstructor, add one field:    private Meter-Regi stry meterRegistry; (serviceImpl me)
+                                   Note:- Micrometer is the facade whatever we record flows out over OTLP automatically Shows up in Grafana next to built-in 
+                                          metrics — zero extra wiring 
+                                           - Creating a Counter :
+                                                       meterRegistry.counter ("accounts.operations","operation","created").increment();
+                                                 • Anatomy of one line:
+                                                       - counter(...) --> the metric type
+                                                       - "accounts.operations"--> metric name
+                                                       - "operation,"created"--> a tag (key, value)
+                                                       - .increment( )--> bump the count up by 1
+                                           - What Is a Counter?
+                                                    Simplest metric — a number that only goes up, never down. Perfect for counting how many times an event happened
+                                                    You can't un-create an account counter fits naturally
+                                                    Naming convention: lowercase, dot-separated (accounts.operations)
+                                           - Tags = Dimensional Metrics (the key idea) :
+                                                     Same metric name, different tag value per operation:
+                                                                                      createAccount --> operation=created
+                                                                                      updateAccount --> operation—updated
+                                                                                      deleteAccount --> operation—deleted
+                                                     One metric, sliced by the operation dimension. In Grafanan you can then:
+                                                                                      See the total across all operation
+                                                                                      Break down by operation (created vs updated vs deleted)
+                                                                                      Filter to just one (e.g. only deletions)
+                Q12. Sharing TracelD to Client :
+                            The Problem: Finding One Failed Request
+                                           User hits an error --> calls support --> "it just failed", no details
+                                           One bad request out of thousands, across gateway + accounts + cards + loans
+                                           Finding it manually = needle in a haystack
+                                           We already have the fix built: the trace ID (unique per request)
+                            The Idea: Hand the Trace ID Back to the Client 
+                                           Return the trace ID inside the response header
+                                           User/app copies it --> shares with support --> developer pastes into Grafana
+                                           Instantly pulls up the exact request, every service, every log
+                                           Best place to do it: the gateway server — every request passes through it
+                            Code snippet of the filter in GatewayServer :
+                                                 @Component
+                                                 public class TraceIdResponseFilter implements GlobalFilter {
+
+                                                     public static final String TRACE_ID_HEADER = "X-Trace-Id";
+
+                                                     private final Tracer tracer;
+
+                                                     public TraceIdResponseFilter(Tracer tracer) {
+                                                         this.tracer = tracer;
+                                                     }
+
+                                                     @Override
+                                                     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+                                                         exchange.getResponse().beforeCommit(() -> {
+                                                             Span currentSpan = tracer.currentSpan();
+                                                             if (currentSpan != null) {
+                                                                 exchange.getResponse().getHeaders()
+                                                                         .add(TRACE_ID_HEADER, currentSpan.context().traceId());
+                                                             }
+                                                             return Mono.empty();
+                                                         });
+                                                         return chain.filter(exchange);
+                                                     }
+
+                                                 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

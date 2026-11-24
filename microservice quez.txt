@@ -2820,167 +2820,220 @@ SECTION 11 :
 
 
 
+SECTION 12 :
+        Microservices Security
+-------------------------------
+                Q1. What are the challenges of securing microservices? 
+                          CHALLENGE-7 : 
+                                - CENTRALIZED IDENTITY AND ACCESS MANAGEMENT (IAM)? :
+                                       How to maintain a centralized component to store user credentials, handling identity & access management ?
+                         - These challenges in microservices can be solved using below concepts or solutions,
+                                       Using OAuth2/OpenID Connect, KeyCloak (IAM), Spring Security we can secure the microservices and handle all the above challenges.
+                         - PROBLEM THAT OAUTH2 SOLVES :
+                                  - Why should we use OAUTH2 framework for implementing security inside our microservices ? Why can't we use the basic authentication ? 
+                                    To answer this, first lets try to understand the basic authentication & it's drawbacks.
+                                        • Basic Authentication :
+                                                   Early websites usually ask for credentials via an HTML form, which the browser will send to the server. The server 
+                                                   authenticates the information and writes a session value in the cookie; as long as the session is still marked
+                                                   active, user can access protected features and resources.
+                                        • Drawbacks of Basic authentication :
+                                              - Backend server or business logic is tightly coupled with the Authentication/Authorization logic,making it difficult to 
+                                                use with mobile applications and REST APIs. 
+                                              - Basic Authentication does not easily support situations where users want to allow third-party applications to access 
+                                                their data on a platform.
+                                                Example: Suppose you use a Google account and want to allow a third-party application to access your Google Drive files.
+                                                          Basic Authentication does not handle this type of access easily.
+
+                         - INTRODUCTION TO OAUTH2 :
+                                OAuth stands for Open Authorization. It's a free and open protocol, built on IETF standards and licenses from the Open Web Foundation.
+                                OAuth 2.1 is a security standard where you give one application permission to access your data in another application. The steps to 
+                                grant permission, or consent, are often referred to as authorization or even delegated authorization. You authorize one application to 
+                                access your data, or use features in another application on your behalf, without giving them your password.
+                                NOTE:- primary reason to build OAuth2 is for Authorization not authentication.
+                                     - Below are the few advantages Of OAuth2 standard,
+                                          • Supports all kinds of Apps: 
+                                                  OAuth2 supports different types of applications,such as server-to-server,web applications,mobile applications (Android/iOS),
+                                                  IoT devices, and smart TVs. It provides different authorization flows, such as Authorization Code Grant and Client 
+                                                  Credentials Grant, to allow these applications to communicate securely.
+                                          • Separation of Auth logic: 
+                                                  OAuth2 separates authentication and authorization logic from the business logic. It uses a separate Authorization 
+                                                  Server to handle login requests, verify users, and issue Access Tokens.
+                                                  All applications can connect to the same Authorization Server for login and token generation. User credentials and 
+                                                  client application credentials are maintained in one central place (Authorization Server).
+                                                  Example: Suppose an organization has 3 applications:
+                                                                                           - Web Application
+                                                                                           - Mobile Application
+                                                                                           - Admin Application
+                                                  Instead of managing login and security separately in all three applications: All three applications connect to a 
+                                                  single Authorization Server for authentication and Access Tokens.
+                                          • No need to share Credentials: 
+                                                  OAuth2 allows third-party applications to access your resources without sharing your username and password.
+                                                  Instead, OAuth2 provides an Access Token that gives limited permission to access specific resources.
+                                                  Simple Example: Suppose you want to allow a third-party application to access your Google Drive files.
+                                                                  - You don't need to share your Google username and password.
+                                                                  - You grant permission to the application.
+                                                                  - The application receives an Access Token.
+                                                                  - Using this token, it can access only the resources you have allowed.
+                                     - OAUTH2 TERMINOLOGY :
+                                          • Resource owner - 
+                                                - It is you the end user. In the scenario of Stackoverflow, the end user who want to use the GitHub services to get his details. 
+                                                - In other words, the end user owns the resources (email, profile), that's why we call him as Resource owner
+                                          • Client -
+                                                - The website, mobile app or API will be the client as it is the one which interacts with GitHub services on behalf of the resource owner/end user. 
+                                                - In the scenario of Stackoverflow, the Stackoverflow website is Client
+                                          • Authorization Server -
+                                                - This is the server which knows about resource owner. 
+                                                - In other words, resource owner should have an account in this server. 
+                                                - In the scenario of Stackoverflow, the GitHub server which has authorization logic acts as Authorization server.
+                                          • Resource Server -
+                                                - It is the server where the user's protected data (such as email and profile details) is stored and provided to the client when access is allowed.
+                                                - In the scenario of Stackoverflow, the resources like User Email, Profile details are hosted inside GitHub server. 
+                                                  So it will act as a resource server
+                                          • Scopes -
+                                                - Scopes define what permissions a Client is requesting, such as reading the user's email or viewing their profile. 
+                                                  The Authorization Server issues an Access Token with the permissions that are allowed.
+
+                Q1. What is OpenID Connect?
+                          - OpenID Connect is a protocol that sits on top of the OAuth 2.0 framework. While OAuth 2.0 provides authorization via an access token 
+                            containing scopes, OpenID Connect provides authentication by introducing a new ID token which contains a new set of information and claims 
+                            specifically for identity.
+                          - With the ID token, OpenID Connect brings standards around sharin identity details among the applications.
+                                           ___________________
+                                          |                   |
+                                          |  OpenID Connect   |<------------- Authentication
+                                          |___________________|
+                                          |                   |                                             The OpenID Connect flow looks the same as OAuth. The only
+                                          |  OAuth 2.0        |<------------- Authorization                 differences are, in the initial request, a specific scope
+                                          |___________________|                                             of openid is used, and in the final exchange the client receives
+                                          |                   |                                             both an Access Token and an ID Token.
+                                          |                   |
+                                          |      HTTP         |
+                                          |___________________|
 
 
+                Q1. Why is OpenID Connect important?
+                          - Identity is the key to any application. At the core of modern authorization is OAuth 2.0, but OAuth 2.0 lacks an authentication component.
+                            Implementing OpenID Connect on top of OAuth 2.0 completes an IAM (Identity & Access Management) strategy.
+                          - As more and more applications need to connect with each other and more identities are being populated on the internet, the demand to be
+                            able to share these identities is also increased. With OpenID connect, applications can share the identities easily and standard way.
+                          - OpenID Connect add below details to OAuth 2.0 :
+                                 1. Standardized Scopes : OIDC(OpenID Connect) provides standard scopes to request user information:
+                                            - openid → Tells the server that the client is using OIDC.
+                                            - profile → Requests basic profile details like name and picture.
+                                            - email → Requests user's email address.
+                                            - address → Requests user's address.
+                                 2. ID Token using JWT standard :
+                                            - OIDC provides an ID Token in JWT format, which contains information about the user's identity.
+                                              Example: User ID, name, email, etc.
+                                 3. OIDC exposes the standardized "/userinfo" endpoint :
+                                            - OIDC provides a standard /userinfo endpoint that the client can call using an Access Token to get the user's profile 
+                                              information.
+                    - CLIENT CREDENTIALS GRANT TYPE FLOW IN OAUTH2 / Is flow mein client application apni identity prove karke Access Token leti hai.
+                                   CLIENT                                         AUTH SERVER                                RESOURCE SERVER
+                                   |              1.                                  |                                         |
+                                   | I want to access protected resources.            |                                         |
+                                   | Here are my client credentials. No user          |                                         |
+                                   |            involved in this                      |                                         |
+                                   |------------------------------------------------->|                                         |
+                                   |                                                  |                                         |
+                                   |                                                  |                                         |
+                                   |           2.                                     |                                         |
+                                   | Hey Client,The credentials provided are correct. |                                         |
+                                   |        Here is the ACCESS TOKEN to               |                                         |
+                                   |      access the protected resources              |                                         |
+                                   |<-------------------------------------------------|                                         |
+                                   |                                                  |                                         |
+                                   |                                                  |                                         |
+                                   |                                                  |                                         |
+                                   |            3.                                    |                                         |
+                                   | Hey Resource Server, I want to access a          |                                         |
+                                   |  protected resources. Here is the access         |                                         |
+                                   |     token issued by Auth server                  |                                         |
+                                   |------------------------------------------------------------------------------------------->|                                                                    
+                                   |                                                  |                                         |
+                                   |                                                  |                                         |
+                                   |                                                  |                                         |
+                                   |                                                  |                4.                       |
+                                   |                                                  | Hey Client. Your token is validated     |
+                                   |                                                  |   successfully. Here are the resources  |
+                                   |                                                  |               you requested             |
+                                   |<-------------------------------------------------------------------------------------------|                                 
+                                   |                                                  |                                         |
+                                   |                                                  |                                         |
+
+                       Client Credentials Grant Type is used when one application wants to access another application's protected resources without involving a user.
+                       Example: Accounts Microservice wants to access Loans Microservice through a backend API.
+                   Step 1: Client requests an Access Token :
+                          Client application sends a request to the Authorization Server's Token Endpoint with the following details:
+                                          | Parameter       | Beginner-level meaning                                     |
+                                          | --------------- | ---------------------------------------------------------- |
+                                          | `client_id`     | Client application ki identity / username                  |
+                                          | `client_secret` | Client application ka secret / password                    |
+                                          | `scope`         | Client ko kis level ka access chahiye                      |
+                                          | `grant_type`    | Access Token lene ka method; value is `client_credentials` |
+                          Scope example:
+                          EMAIL, PROFILE
+                          Scope specifies what permissions the client is requesting. The Authorization Server decides which permissions to grant.
+
+                          Grant Type example:
+                          grant_type=client_credentials
+                          It tells the Authorization Server that the client wants to obtain an Access Token using the Client Credentials Grant Flow.
+                       Important Notes :
+                                       - This is one of the simplest OAuth 2.0 grant flows.
+                                       - No user login is required.
+                                       - No user or UI is involved.
+                                       - It is commonly used for backend-to-backend API communication.
+                                       - Client authenticates itself using its Client ID and Client Secret.
+
+                    - SECURING GATEWAY USING CLIENT CREDENTIALS GRANT TYPE FLOW IN OAUTH2 :
+                                   __________________
+                                  |   AUTH SERVER    |                   3. 
+                                  |   (keycloak)     |←-------------------------------------.
+                                  |__________________|          Edge server validates the   |
+                                          ↑                     access token issued by Auth |
+                                          |                                 server          |
+                                          |                                                 |
+                                          |                                                 |
+                                          |                                                 |
+                                          |                                                 |
+                                          |                                                 |
+                                          |                                                 |
+                                          |                                                 |
+                 1.                       |                                                 |
+          Client connects with Auth server|                                                 |                                        ________________________
+           with client credentials and get|                                                 |                 4.                    |     _____________      |
+            a access token.               |                  2.                             |         If the access token valid,    |    |             |     |
+                                          |         Client invokes a path in                |          edge server allows the       |    | Loans Ms    |     |
+                                   _______|______  edge server using access           ______|_________    request to the actual     |    |_____________|     |
+                                  |              |  token issued by Auth             |                |           services          |                        |
+                                  | External     |        server                     | Gateway/Edge   |                             |     _____________      |
+                                  | service/APl  |---------------------------------->| Service        |---------------------------->|    |             |     |
+                                  |______________|                                   |________________|                             |    | Accounts Ms |     |
+                                       CLIENT                                          RESOURCE SERVER                              |    |_____________|     |
+                                                                                                                                    |                        |
+                                                                                                                                    |     _____________      |
+                                                                                                                                    |    |             |     | 
+                                                                                                                                    |    | Cards Ms    |     |
+                                                                                                                                    |    |_____________|     |
+                                                                                                                                    |________________________|
+
+      Note:-  When ever an external system trying to communicate with Spring Cloud Gateway where there is no end user                Unsecured services deployed
+              involved, then we need to use the OAuth2 Client Credentials grant flow for Authentication & Authorization.             behind the docker network or
+                                                                                                                                     Kubernetes firewall network. So
+                         ABOVE DIAGRAM WE CAN SEE IN MORE DETAILS FOR THAT REFER MADAN REDDY NOTES.                                  can't be accessed directly
+                    
+
+                Q1. 
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 
+                Q1.
+                Q1. 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                Q1. Logging in Monolithic Apps  vs Logging in Microservices ?
-                        - Logging in Monolithic Apps :
-                                    In monolithic apps, all Of the code is in a single codebase. This means that all Of the logs are also in a single location. This 
-                                    makes it easy to find and troubleshoot problems, as you only need to look in one place. 
-                        - Logging in Microservices :
-                                   - Logging in microservices is complex. This is because each service has its own logs. This means that you need to 1ook in multiple 
-                                     places to find all of the logs for a particular request.
-                                   - To address this challenge, microservices architectures often use centralized logging. Centralized logging collects logs from all 
-                                     of the services in the architecture and stores them in a single location. This makes it easier to find and troubleshoot problems, 
-                                     as you only need to look in one place.
-
-
-                                               ONE OF THE PILLARS of OBSERVABILITY LOGGING EXPLAINED.
-                                               ''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-                        - Managing centralized logs with Grafana, Grafana Loki & Alloy :
-                             • Grafana :
-                                  - Grafana is an open-source analytics and interactive visualization web application. It provides charts, graphs, and alerts for the 
-                                    web when connected to supported data sources. It can be easily installed using Docker or Docker Compose.
-                                  - Grafana is a popular tool for visualizing metrics, logs, and traces from a variety of sources. It is used by organizations of all 
-                                    sizes to monitor their applications and infrastructure.
-                             • Grafana Loki :
-                                  - it is one of the tools of Grafana.
-                                  - Grafana Loki is a log aggregation system that collects and stores logs from different applications in one place, so we can easily 
-                                    search and troubleshoot problems.
-                                  - FROM GRAFANA LOKI 3.0, Alloy replaced Promtail.
-                             • Alloy :
-                                  - Grafana Alloy is a lightweight log agent that ships logs From your containers to Loki. It is easy to configure and can be used to 
-                                    collect logs From a wide variety OF sources.
-                          NOTE:- Together, Grafana Loki and Alloy provide a powerful logging solution that can help you to understand and troubleshoot your applications. 
-                                 Grafana provides visualization of the log lines captured within Loki.
-                                       .--------------------------.
-                                       |                          |
-                                       | API Gateway ,            |                        .--------------------------.
-                                       | Loans Microservices ,    |                        |        Grafana           |
-                                       | Cards Microservices ,    |                        | Query,search,visualize   |
-                                       | Accounts Microservices   |                        | the logs with Loki as    |
-                                       |                          |                        |     datasource           |
-                                       '--------------------------'                        '--------------------------'
-                                                    ↑                                                   |
-                                                    |                                                   |
-                                                    |  Fetches logs                                     |  Query & Search logs
-                                                    |                                                   |
-                                                    |                                                   |
-                                       .--------------------------.                                     ↓
-                                       |        Alloy             |                          .------------------------.
-                                       | collects logs From       |      Forward logs        |        Loki            |
-                                       | containers, process &    |-------------------------→| log aggregation system |
-                                       | Forwards them Loki       |                          '------------------------'
-                                       '--------------------------'         
-
-                                 Sample demo OF logging using Grafana, Loki & Alloy :
-                                       - Reference to see diagram, how it workflow and steps to implement it:  
-                                                         - https://grafana.com/docs/loki/latest/get-started/quick-start/quick-start/
-                                                         - cloud-native applications generate logs as events and send them to the standard output, without being 
-                                                           concerned about the processing or storage OF those logs.
-                                                         One advantage of treating logs as event streams and emitting them to stdout is that it decouples the application 
-                                                           From the log processing infrastructure. The application can focus on its core Functionality without being tied
-                                                           to a specific logging implementation or storage solution. The infrastructure, on the other hand, can handle the 
-                                                           collection, aggregation, and storage of logs using appropriate tools and services.
-                                                        15-Factor methodology recommends the same to treat logs as events streamed to the standard output and not concern
-                                                           with how they are processed or stored.
-                                       - for more refere madan reddy notes.
-
-
-                                               ONE OF THE PILLARS of OBSERVABILITY METRICS EXPLAINED.
-                                               ''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-                        - Metrics & monitoring with Spring Boot Actuator, Micrometer, Prometheus & Grafana :
-                               Note:-
-                                   Event logs are essential for monitoring applications, but they don't provide enough data to answer all Of the questions we need to 
-                                   know. TO answer questions like CPU usage, memory usage, threads usage, error requests etc. & properly monitor, manage, and troubleshoot
-                                   an application in production, we need more data.
-                                   Metrics are numerical measurements of an application's performance, collected and aggregated at regular intervals. They can be used 
-                                   to monitor the application's health and performance, and to set alerts or notifications when thresholds are exceeded.
-                                                                             or
-                                   Metrics numerical values hote hain jo application ki performance aur health ko measure karte hain.
-                                   Examples: CPU usage, memory usage, request count, response time.
-                             • 1.ACTUATOR :
-                                  - Actuator is mainly used to expose operational information about the running application — health, metrics, info, dump, env, etc. 
-                                  - It uses HTTP endpoints or JMX beans to enable us to interact with it.
-                             • 2.MICROMETER :
-                                  - Micrometer automatically exposes /actuator/metrics data into something your monitoring system can understand. 
-                                  - All you need to do is include that vendor-specific micrometer dependency in your application. Think SLF4J, but for metrics.
-                             • 3.Prometheus :
-                                  - The most common format for exporting metrics is the one used by Prometheus,which is "an open-source systems monitoring and alerting
-                                    toolkit". Just as Loki aggregates and stores event logs, Prometheus does the same with metrics.
-                             • 1.Grafana :
-                                  - Grafana is a visualization tool that can be used to create dashboards and charts from Prometheus data.
-                                       .--------------------------.
-                                       |                          |
-                                       | API Gateway ,            |                        .---------------------------.
-                                       | Loans Microservices ,    |                        |        Grafana            |
-                                       | Cards Microservices ,    |                        | Query,search,visualize the|
-                                       | Accounts Microservices   |                        | metrics,build dashboard,  |
-                                       |                          |                        | alerts with Prometheus as |
-                                       '--------------------------'                        |      datasource           |                       
-                     Microservices with the         ↑                                      '--------------------------'                                        
-                     help of actuator and           |                                                   |
-                     micrometer exposes             |                                                   |  Query metrics from
-                     metrics information            |                                                   |
-                                                    |                                                   |
-                                                    |                                                   ↓
-                                                    |                                        .------------------------.
-                                                    |   scrapes metrics from services        |     Prometheus         |
-                                                    '---------------------------------------→|  Metrics acregator &   |
-                                                                                             |   monitoring systen    |                   
-                                                                                             '------------------------'
-
-                        - Setup of micrometer inside microservices :
-                               1. in every microservice add actuator,micrometer dependency :
-
-                                                
-                                                         	<dependency>
-			                                                 <groupId>io.micrometer</groupId>
-			                                                 <artifactId>micrometer-registry-prometheus</artifactId>
-		                                                </dependency>
-                               2. in every microservice add :
-                                                       management:
-                                                            metrics:
-                                                              tags:
-                                                                application: ${spring.application.name}
-                              3. to test even exposing metrics :
-                                               - metrics endpoint: http://localhost:8080/actuator/metrics
-                                               - metrics endpoint: http://localhost:8080/actuator/prometheus      #port jispe tumhara application running ho.
-
-
-                                               ONE OF THE PILLARS of OBSERVABILITY TRACE EXPLAINED.
-                                               ''''''''''''''''''''''''''''''''''''''''''''''''''''''
                 Q1.
                 Q1. 
                 Q1.
